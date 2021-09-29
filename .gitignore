@@ -1,7 +1,7 @@
-*.docx
-/data/
+/01_data/
+/03_outputs/
+/04_other/
 .DS_STORE
-*.pdf
 
 
 .Rproj.user
