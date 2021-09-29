@@ -84,9 +84,10 @@ vreg %<>%
          'registered_republicans' = rep) %>% 
   # calculate partisan percentage
   mutate(perc_democrats = registered_democrats / voter_registrations_total,
-         perc_republicans = registered_republicans / voter_registrations_total) 
+         perc_republicans = registered_republicans / voter_registrations_total) %>% 
+  select(-c(registered_democrats, registered_republicans, voter_registrations_total))
 
-# drop Coter Registration columns from data
+# drop Voter Registration columns from data
 data %<>% 
   select(-starts_with('vreg'))
 
@@ -107,7 +108,6 @@ popden %<>%
 # drop Population Density columns from data
 data %<>% 
   select(-starts_with('popden'))
-
 
 # Create Master data set --------------------------------------------------
 
@@ -137,9 +137,9 @@ data %<>%
   # join Voter Registration data
   left_join(vreg, by = c("id", "year")) %>%
   # fill up voter registration data with last 2 years
-  fill(voter_registrations_total, .direction = "down") %>%
-  fill(registered_democrats, .direction = "down") %>%
-  fill(registered_republicans, .direction = "down") %>%
+  # fill(voter_registrations_total, .direction = "down") %>%
+  # fill(registered_democrats, .direction = "down") %>%
+  # fill(registered_republicans, .direction = "down") %>%
   fill(perc_democrats, .direction = "down") %>%
   fill(perc_republicans, .direction = "down")
 
@@ -333,10 +333,10 @@ data %<>%
          "employ_leisure_hospitality" = "Leisure and Hospitality",
          "employ_other_services" = "Other Services",
          "employ_government" = "Government",
-         "laborforce_county" = "Labor Force",
-         "employment_county" = "Employment",
-         "unemployment_county" = "Unemployment",
-         "unemployment_rate_county" = "Unemployment Rate")
+         "county_laborforce" = "Labor Force",
+         "county_employment" = "Employment",
+         "county_unemployment" = "Unemployment",
+         "county_unemployment_rate" = "Unemployment Rate")
 
 # remove unneeded data sets
 rm(labor, unemployment)
@@ -449,7 +449,7 @@ demographics %<>%
   # subset and rename
   select(county, 
          year, 
-         county_pop = population, 
+         # county_pop = population, 
          county_pop_growth = pop_growth, 
          county_vacancy_rate = vacancy_rate, 
          county_persons_per_household = persons_per_household)
@@ -461,6 +461,60 @@ data %<>%
 
 # remove unneeded data sets
 rm(demographics)
+
+# Inspect Data ------------------------------------------------------------
+
+# check for missing values in feature space
+data %>% 
+  sapply(function(x) sum(is.na(x))) %>% 
+  data.frame() %>% 
+  rownames_to_column() %>% 
+  rename(feature = "rowname", 
+         n_NA = ".") %>% 
+  mutate(na_ratio = round(n_NA/ nrow(data), digits = 2))
+
+# take a closer look at the missing labor data
+data %>% 
+  select(county, starts_with('employ_')) %>% 
+  pivot_longer(cols = -county, names_to = 'industry', values_to = 'employed') %>% 
+  group_by(county, industry) %>% 
+  summarise(n_na = sum(is.na(employed))) %>% 
+  arrange(desc(n_na)) 
+
+# plot population density on log10-scale
+data %>% 
+  ggplot()+
+  aes(x = population_density_mean)+
+  geom_histogram()+
+  scale_y_log10()
+
+# missing labor data are actually implicit zeroes
+# as they only appear in the most sparsely populated
+# counties where almost no local business exists
+
+# population density are also implicit zeroes
+# as uninhabited areas are excluded
+
+# imputation
+data %<>% 
+  # replace NAs with 0 for labor statistics
+  mutate_at(vars(starts_with("employ")), 
+            replace_na, 
+            replace = 0) %>% 
+  # replace NAs with 0 for population density
+  mutate(population_density_mean = replace_na(population_density_mean, 0)) %>% 
+  # compute industry employees as shares of laborforce
+  mutate_at(.vars = vars(starts_with('employ_')), 
+            .funs = ~./county_laborforce) %>% 
+  # rename features
+  rename_at(.vars = vars(starts_with('employ_')), 
+            .funs = ~glue("share_{str_replace(., 'employ_', '')}")) %>% 
+  # drop unneeded features
+  select(-c(county_laborforce, county_employment, county_unemployment))
+
+# final NA check
+data %>% 
+  sapply(function(x) sum(is.na(x)))
 
 # Feature Engineering -----------------------------------------------------
 
@@ -495,52 +549,11 @@ data %<>%
   select(-c(community_protectplan_date, 
             FFSC_year, 
             CCED_date, 
-            month_numeric)) %>% 
+            month_numeric,
+            date_floored)) %>% 
   # drop unneeded observations
   filter(!id %in% c("841", "1318", "4092", "4115", "4138", "4161", "4184", 
                     "4207", "6186", "6370", "6393", "6416"))
-
-
-# Inspect Data ------------------------------------------------------------
-
-# check for missing values in feature space
-data %>% 
-  sapply(function(x) sum(is.na(x))) %>% 
-  data.frame() %>% 
-  rownames_to_column() %>% 
-  rename(feature = "rowname", 
-         n_NA = ".") %>% 
-  mutate(na_ratio = round(n_NA/ nrow(data), digits = 2))
-
-# take a closer look at the missing labor data
-data %>% 
-  select(county, starts_with('employ')) %>% 
-  pivot_longer(cols = -county, names_to = 'industry', values_to = 'employed') %>% 
-  group_by(county, industry) %>% 
-  summarise(n_na = sum(is.na(employed))) %>% 
-  arrange(desc(n_na)) 
-
-# missing labor data are actually implicit zeroes
-# population density are also implicit zeroes
-# as uninhabited areas are excluded
-
-# replace NAs with 0
-data %<>% 
-  mutate_at(vars(starts_with("employ")), 
-            replace_na, 
-            replace = 0) %>% 
-  mutate(population_density_mean = replace_na(population_density_mean, 0))
-
-# plot population density on log10-scale
-data %>% 
-  ggplot()+
-  aes(x = population_density_mean)+
-  geom_histogram()+
-  scale_y_log10()
-
-# final NA check
-data %>% 
-  sapply(function(x) sum(is.na(x)))
 
 # write final tibble to disk
 write_rds(data, "data/data_final.rds")
