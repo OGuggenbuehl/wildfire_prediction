@@ -1,0 +1,7 @@
+*.docx
+/data/
+.DS_STORE
+*.pdf
+
+
+.Rproj.user
