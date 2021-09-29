@@ -500,23 +500,47 @@ data %<>%
   filter(!id %in% c("841", "1318", "4092", "4115", "4138", "4161", "4184", 
                     "4207", "6186", "6370", "6393", "6416"))
 
-# Impute with MICE --------------------------------------------------------
-library(mice)
 
-# subset <- data %>% 
-#   select(-c(starts_with('fire'), date_floored, id)) %>% 
-#   as.data.frame()
-# 
-# start <- Sys.time()
-# imp1 <- mice(data = subset)
-# end <- Sys.time()
-# 
-# end-start
-# write_rds(imp1, "data/data_imp_mice.rds")
-imputes <- read_rds("data/data_imp_mice.rds")
+# Inspect Data ------------------------------------------------------------
 
-data_imputed <- complete(imputes)
+# check for missing values in feature space
+data %>% 
+  sapply(function(x) sum(is.na(x))) %>% 
+  data.frame() %>% 
+  rownames_to_column() %>% 
+  rename(feature = "rowname", 
+         n_NA = ".") %>% 
+  mutate(na_ratio = round(n_NA/ nrow(data), digits = 2))
 
+# take a closer look at the missing labor data
+data %>% 
+  select(county, starts_with('employ')) %>% 
+  pivot_longer(cols = -county, names_to = 'industry', values_to = 'employed') %>% 
+  group_by(county, industry) %>% 
+  summarise(n_na = sum(is.na(employed))) %>% 
+  arrange(desc(n_na)) 
+
+# missing labor data are actually implicit zeroes
+# population density are also implicit zeroes
+# as uninhabited areas are excluded
+
+# replace NAs with 0
+data %<>% 
+  mutate_at(vars(starts_with("employ")), 
+            replace_na, 
+            replace = 0) %>% 
+  mutate(population_density_mean = replace_na(population_density_mean, 0))
+
+# plot population density on log10-scale
+data %>% 
+  ggplot()+
+  aes(x = population_density_mean)+
+  geom_histogram()+
+  scale_y_log10()
+
+# final NA check
+data %>% 
+  sapply(function(x) sum(is.na(x)))
 
 # write final tibble to disk
 write_rds(data, "data/data_final.rds")
