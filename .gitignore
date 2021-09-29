@@ -2,6 +2,5 @@
 /03_outputs/
 /04_other/
 .DS_STORE
-
-
 .Rproj.user
+*.Rproj
