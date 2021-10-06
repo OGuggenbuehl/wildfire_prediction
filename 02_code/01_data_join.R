@@ -4,7 +4,6 @@ library(lubridate)
 library(magrittr)
 library(scales)
 library(readxl)
-library(missForest)
 
 # load data from .CSV
 data <- read_csv("data/gis/data_4k_km_grid.csv") %>% 
