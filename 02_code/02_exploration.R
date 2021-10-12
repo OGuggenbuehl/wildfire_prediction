@@ -4,13 +4,63 @@ library(corrplot)
 # load data ---------------------------------------------------------------
 data <- read_rds("01_data/data_final.rds")
 
-data %>% filter(year > 2017) %>% 
-  count(fire) %>% 
-  mutate(prop = n/sum(n))
 
-data %>% group_by(county) %>% 
+# share of fire event -----------------------------------------------------
+
+# total
+data %>% 
+  pull(fire) %>% table() %>% as_tibble() %>% 
+  pivot_wider(names_from = '.', values_from = n) %>% 
+  mutate(ratio = `TRUE` / `FALSE`)
+
+data %>% 
+  group_by(county) %>% 
   count(fire) %>% 
-  mutate(prop = n/sum(n)) %>% View()
+  mutate(prop = n/sum(n)) %>% 
+  filter(fire) %>% 
+  arrange(n)
+
+# subset year
+data %>% 
+  filter(year >= 2015) %>% 
+  pull(fire) %>% table() %>% as_tibble() %>% 
+  pivot_wider(names_from = '.', values_from = n) %>% 
+  mutate(ratio = `TRUE` / `FALSE`)
+
+# aggregate to seasonal
+data %>% 
+  group_by(id, county, year, season) %>% 
+  summarise(fire = as.logical(max(fire))) %>% 
+  ungroup() %>%
+  pull(fire) %>% table() %>% as_tibble() %>% 
+  pivot_wider(names_from = '.', values_from = n) %>% 
+  mutate(ratio = `TRUE` / `FALSE`)
+
+# subset years & aggregate seasonal
+data %>% 
+  filter(year >= 2015) %>%
+  group_by(id, county, year, season) %>% 
+  summarise(fire = as.logical(max(fire))) %>% 
+  ungroup() %>%
+  pull(fire) %>% table() %>% as_tibble() %>% 
+  pivot_wider(names_from = '.', values_from = n) %>% 
+  mutate(ratio = `TRUE` / `FALSE`)
+
+# count by seasons
+data %>% 
+  filter(year >= 2015) %>% 
+  group_by(season) %>% 
+  count(fire) %>% 
+  pivot_wider(names_from = fire,
+              values_from = n) %>% 
+  mutate(ratio = `TRUE` / `FALSE`)
+
+# dims seasonal
+data %>% 
+  # filter(year <= 2016) %>%
+  group_by(id, county, year, season) %>% 
+  summarise(fire = as.logical(max(fire))) %>% 
+  ungroup() 
 
 # data exploration --------------------------------------------------------
 str(data)

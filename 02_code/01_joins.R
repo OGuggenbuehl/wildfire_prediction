@@ -6,7 +6,7 @@ library(scales)
 library(readxl)
 
 # load data from .CSV
-data <- read_csv("data/gis/data_4k_km_grid.csv") %>% 
+data <- read_csv("01_data/gis/data_4k_km_grid.csv") %>% 
   select(-c(left, top, right, bottom, ends_with('1912mean')))
 
 # WorldClim ---------------------------------------------------------------
@@ -167,25 +167,25 @@ data %<>%
 rm(id, date)
 
 # load data
-dist_city <- read_csv("data/gis/dist_city.csv") %>% 
+dist_city <- read_csv("01_data/gis/dist_city.csv") %>% 
   select(id, dist_city)
 
-dist_firestation <- read_csv("data/gis/dist_firestation.csv") %>% 
+dist_firestation <- read_csv("01_data/gis/dist_firestation.csv") %>% 
   select(id, dist_firestation = dist_facil)
 
-dist_lake <- read_csv("data/gis/dist_lake.csv") %>% 
+dist_lake <- read_csv("01_data/gis/dist_lake.csv") %>% 
   select(id, dist_lake)
 
-dist_power <- read_csv("data/gis/dist_power.csv") %>% 
+dist_power <- read_csv("01_data/gis/dist_power.csv") %>% 
   select(id, dist_power)
 
-dist_river <- read_csv("data/gis/dist_river.csv") %>% 
+dist_river <- read_csv("01_data/gis/dist_river.csv") %>% 
   select(id, dist_river)
 
-dist_road <- read_csv("data/gis/dist_road.csv") %>% 
+dist_road <- read_csv("01_data/gis/dist_road.csv") %>% 
   select(id, dist_road)
 
-fire_data <- read_csv("data/gis/fire_db_grid.csv") %>% 
+fire_data <- read_csv("01_data/gis/fire_db_grid.csv") %>% 
   select(id, year = YEAR_, 
          alarm_date = ALARM_DATE, 
          contain_date = CONT_DATE) %>% 
@@ -255,7 +255,7 @@ rm(dist_city, dist_firestation, dist_lake, dist_power, dist_river, dist_road, fi
 # Labor Data --------------------------------------------------------------
 
 # load labor data
-labor <- read_csv("data/labor/labor data.txt") %>% 
+labor <- read_csv("01_data/labor/labor data.txt") %>% 
   # subset and rename
   select(year = StartEndYear,
          month = Period,
@@ -279,7 +279,7 @@ labor <- read_csv("data/labor/labor data.txt") %>%
 # Unemployment ------------------------------------------------------------
 
 # load data
-unemployment <- read_csv("data/labor/unemployment.txt") %>% 
+unemployment <- read_csv("01_data/labor/unemployment.txt") %>% 
   # subset and rename
   select(year = Year,
          month = Period,
@@ -300,7 +300,7 @@ month_mapping <- tibble(month = month.abb,
                         month_numeric = 1:12)
 
 # load county names corresponding to polygon IDs
-counties <- read_csv("data/gis/counties.csv") %>% 
+counties <- read_csv("01_data/gis/counties.csv") %>% 
   rename(county = COUNTY_NAM,
          county_abb = COUNTY_ABB,
          county_num = COUNTY_NUM,
@@ -343,8 +343,8 @@ rm(labor, unemployment)
 # Ballot Measures ---------------------------------------------------------
 
 # load ballot measures data
-ballot_measures_2010 <- read_csv2("data/ballot measures CA/2010-ballot-measures-summary.csv")
-ballot_measures_2016 <- read_csv2("data/ballot measures CA/2016-ballot-measures.csv")
+ballot_measures_2010 <- read_csv2("01_data/ballot measures CA/2010-ballot-measures-summary.csv")
+ballot_measures_2016 <- read_csv2("01_data/ballot measures CA/2016-ballot-measures.csv")
 
 # stack data sets
 ballot_measures <- bind_rows(ballot_measures_2010, ballot_measures_2016) %>% 
@@ -388,7 +388,7 @@ for (year in 2009:2018) {
   # choose different path for 2009 file
   if (year == 2009) {
     
-    df <- read_xls("data/population/E8_2000-2010_Report_ByYear_Final_EOC.xls",
+    df <- read_xls("01_data/population/E8_2000-2010_Report_ByYear_Final_EOC.xls",
              sheet = "2009 County State",
              skip = 3) %>%
       # subset and rename
@@ -403,7 +403,7 @@ for (year in 2009:2018) {
     
   } else {
     
-    df <- read_xlsx("data/population/E-5_2021_InternetVersion.xlsx", 
+    df <- read_xlsx("01_data/population/E-5_2021_InternetVersion.xlsx", 
                     sheet = glue("E5CountyState{year}"), 
                     skip = 2) %>% 
       # subset and rename
@@ -554,5 +554,66 @@ data %<>%
   filter(!id %in% c("841", "1318", "4092", "4115", "4138", "4161", "4184", 
                     "4207", "6186", "6370", "6393", "6416"))
 
+# write monthly tibble to disk
+write_rds(data, "01_data/data_monthly.rds")
+
+# aggregate to seasonal ---------------------------------------------------
+
+data_seasonal <- data %>% 
+  group_by(id, year, season) %>% 
+  summarise(county = unique(county),
+            fire = as.logical(max(fire)),
+            river = unique(river),
+            lake = unique(lake),
+            recreational_routes = unique(recreational_routes),
+            campground = unique(campground),
+            state_park = unique(state_park),
+            picnic = unique(picnic),
+            powerline = unique(powerline),
+            road = unique(road),
+            landcover_majority = unique(landcover_majority),
+            elevation_mean = mean(elevation_mean),
+            SRA = unique(SRA),
+            DPA_agency = unique(DPA_agency),
+            DPA_group = unique(DPA_group),
+            CPP = as.logical(max(community_protect_plan)),
+            CPAD = as.logical(max(CPAD)),
+            CCED = as.logical(max(CCED)),
+            FFSC = unique(FFSC),
+            precip_mean = mean(precip_mean),
+            temp_min_avg = mean(temp_min_avg),
+            temp_max_avg = mean(temp_max_avg),
+            population_density_mean = mean(population_density_mean),
+            perc_democrats = mean(perc_democrats),
+            perc_republicans = mean(perc_republicans),
+            dist_city = mean(dist_city),
+            dist_firestation = mean(dist_firestation),
+            dist_lake = mean(dist_lake),
+            dist_river = mean(dist_river),
+            dist_powerline = mean(dist_power),
+            dist_road = mean(dist_road),
+            share_natresources_construction = mean(share_natresources_mining_construction),
+            share_manufacturing = mean(share_manufacturing),
+            share_trade_transport_utilities = mean(share_trade_transport_utilities),
+            share_IT = mean(share_IT),
+            share_financial = mean(share_financial),
+            share_professional_business = mean(share_professional_business),
+            share_educational_health = mean(share_educational_health),
+            share_leisure_hospitality = mean(share_leisure_hospitality),
+            share_other_services = mean(share_other_services),
+            share_government = mean(share_government),
+            county_unemployment_rate = mean(county_unemployment_rate),
+            perc_yes_prop21 = mean(perc_yes_prop21),
+            perc_yes_prop23 = mean(perc_yes_prop23),
+            perc_yes_prop65 = mean(perc_yes_prop65),
+            perc_yes_prop67 = mean(perc_yes_prop67),
+            county_pop_growth = mean(county_pop_growth),
+            county_vacancy_rate = mean(county_vacancy_rate),
+            county_persons_per_household = mean(county_persons_per_household))
+
+# check if no new NAs were introduced
+data_seasonal %>% 
+  sapply(function(x) sum(is.na(x)))
+
 # write final tibble to disk
-write_rds(data, "data/data_final.rds")
+write_rds(data_seasonal, "01_data/data_seasonal.rds")
