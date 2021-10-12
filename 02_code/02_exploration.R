@@ -40,7 +40,6 @@ data %>%
 ## correlation matrix
 correlation_plot <- data %>% 
   select_if(is.numeric) %>% 
-  rename(share_natresources = share_natresources_mining_construction) %>% 
   cor() %>% 
   corrplot(order = 'hclust')
 

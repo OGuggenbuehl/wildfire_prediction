@@ -609,7 +609,8 @@ data_seasonal <- data %>%
             perc_yes_prop67 = mean(perc_yes_prop67),
             county_pop_growth = mean(county_pop_growth),
             county_vacancy_rate = mean(county_vacancy_rate),
-            county_persons_per_household = mean(county_persons_per_household))
+            county_persons_per_household = mean(county_persons_per_household)) %>% 
+  ungroup()
 
 # check if no new NAs were introduced
 data_seasonal %>% 
