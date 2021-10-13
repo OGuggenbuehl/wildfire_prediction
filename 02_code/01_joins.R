@@ -284,14 +284,35 @@ unemployment <- read_csv("01_data/labor/unemployment.txt") %>%
   select(year = Year,
          month = Period,
          county = Area, 
-         `Labor Force`,
-         Employment,
-         Unemployment,
-         `Unemployment Rate`) %>% 
+         labor_force = `Labor Force`,
+         employment = Employment,
+         unemployment = Unemployment,
+         unemployment_rate = `Unemployment Rate`) %>% 
   # keep only county names
   mutate(county = str_replace(county, 
                               pattern = " County", 
                               replacement = ""))
+
+# calculate unemployment growth
+unemployment %<>% 
+  arrange(county, year, factor(month, levels = month.abb)) %>% 
+  # create lagged unemployment
+  group_by(county) %>% 
+  mutate(unemploy_lag = lag(unemployment, 
+                            n = 1),
+         unemployment_growth = (unemployment - unemploy_lag) / unemploy_lag) %>%
+  ungroup() %>% 
+  # remove unneeded 2009 data
+  filter(year != 2009) %>% 
+  # subset and rename
+  select(year,
+         month,
+         county,
+         labor_force,
+         employment,
+         unemployment,
+         unemployment_rate,
+         unemployment_growth)
 
 # Join Labor & Unemployment Variables ------------------------------------
 
@@ -332,10 +353,11 @@ data %<>%
          "employ_leisure_hospitality" = "Leisure and Hospitality",
          "employ_other_services" = "Other Services",
          "employ_government" = "Government",
-         "county_laborforce" = "Labor Force",
-         "county_employment" = "Employment",
-         "county_unemployment" = "Unemployment",
-         "county_unemployment_rate" = "Unemployment Rate")
+         "county_laborforce" = "labor_force",
+         "county_employment" = "employment",
+         "county_unemployment" = "unemployment",
+         "county_unemployment_rate" = "unemployment_rate",
+         "county_unemployment_growth" = "unemployment_growth")
 
 # remove unneeded data sets
 rm(labor, unemployment)
@@ -509,7 +531,7 @@ data %<>%
   rename_at(.vars = vars(starts_with('employ_')), 
             .funs = ~glue("share_{str_replace(., 'employ_', '')}")) %>% 
   # drop unneeded features
-  select(-c(county_laborforce, county_employment, county_unemployment))
+  select(-c(county_laborforce, county_employment))
 
 # final NA check
 data %>% 
@@ -584,8 +606,6 @@ data_seasonal <- data %>%
             temp_min_avg = mean(temp_min_avg),
             temp_max_avg = mean(temp_max_avg),
             population_density_mean = mean(population_density_mean),
-            perc_democrats = mean(perc_democrats),
-            perc_republicans = mean(perc_republicans),
             dist_city = mean(dist_city),
             dist_firestation = mean(dist_firestation),
             dist_lake = mean(dist_lake),
@@ -602,7 +622,11 @@ data_seasonal <- data %>%
             share_leisure_hospitality = mean(share_leisure_hospitality),
             share_other_services = mean(share_other_services),
             share_government = mean(share_government),
+            county_unemployment = mean(county_unemployment),
             county_unemployment_rate = mean(county_unemployment_rate),
+            county_unemployment_growth = mean(county_unemployment_growth),
+            perc_democrats = mean(perc_democrats),
+            # perc_republicans = mean(perc_republicans),
             perc_yes_prop21 = mean(perc_yes_prop21),
             perc_yes_prop23 = mean(perc_yes_prop23),
             perc_yes_prop65 = mean(perc_yes_prop65),

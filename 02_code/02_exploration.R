@@ -43,6 +43,18 @@ correlation_plot <- data %>%
   cor() %>% 
   corrplot(order = 'hclust')
 
+library(recipes)
+dummies <- recipe(~., data = data) %>% 
+  update_role(id, new_role = "ID") %>% 
+  step_dummy(all_nominal_predictors()) %>% 
+  prep() %>% 
+  bake(new_data = NULL)
+
+dummies_cor <- dummies %>% 
+  select(river, lake, recreational_routes, campground,
+         state_park, picnic, powerline, road, starts_with('dist')) %>% 
+  cor() %>% 
+  corrplot(order = 'hclust')
 # some groups of features are strongly correlated
 # remove these features in preprocessing-pipeline
 # most of these correlations are expected, especially the ones reporting shares
