@@ -43,7 +43,20 @@ correlation_plot <- data %>%
   cor() %>% 
   corrplot(order = 'hclust')
 
+# some groups of features are strongly correlated
+# remove these features in preprocessing-pipeline
+# most of these correlations are expected, especially the ones reporting shares
+# the only real surprise is the strong negative correlation between `year` and 
+# the counties' unemployment rate
+
+# most political features are very strongly correlated
+data %>% 
+  select(starts_with('perc')) %>% 
+  cor()
+
+# test categorical features too by creating dummies
 library(recipes)
+
 dummies <- recipe(~., data = data) %>% 
   update_role(id, new_role = "ID") %>% 
   step_dummy(all_nominal_predictors()) %>% 
@@ -55,16 +68,9 @@ dummies_cor <- dummies %>%
          state_park, picnic, powerline, road, starts_with('dist')) %>% 
   cor() %>% 
   corrplot(order = 'hclust')
-# some groups of features are strongly correlated
-# remove these features in preprocessing-pipeline
-# most of these correlations are expected, especially the ones reporting shares
-# the only real surprise is the strong negative correlation between `year` and 
-# the counties' unemployment rate
 
-# most political features are very strongly correlated
-data %>% 
-  select(starts_with('perc')) %>% 
-  cor()
+# as expected the dummies are quite strongly correlated with the distance measures
+# distance measures are preferred for modeling
 
 # inspect numeric features' distributions
 distributions <- data %>% 

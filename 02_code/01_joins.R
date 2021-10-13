@@ -632,10 +632,11 @@ data_seasonal <- data %>%
             perc_yes_prop65 = mean(perc_yes_prop65),
             perc_yes_prop67 = mean(perc_yes_prop67),
             county_pop_growth = mean(county_pop_growth),
-            county_vacancy_rate = mean(county_vacancy_rate),
-            county_persons_per_household = mean(county_persons_per_household)) %>% 
-  ungroup()
-
+            # county_persons_per_household = mean(county_persons_per_household),
+            county_vacancy_rate = mean(county_vacancy_rate)) %>% 
+  ungroup() %>% 
+  mutate(temp_mean = (temp_min_avg + temp_max_avg)/2)
+ 
 # check if no new NAs were introduced
 data_seasonal %>% 
   sapply(function(x) sum(is.na(x)))
