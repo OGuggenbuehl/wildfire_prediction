@@ -2,7 +2,12 @@ library(tidyverse)
 library(corrplot)
 
 # load data ---------------------------------------------------------------
-data <- read_rds("01_data/data_seasonal.rds")
+data <- read_rds("01_data/data_seasonal.rds") %>% 
+  # drop features
+  select(-c(perc_republicans,
+            county_persons_per_household,
+            temp_min_avg,
+            temp_max_avg))
 
 # data exploration --------------------------------------------------------
 str(data)
@@ -70,7 +75,7 @@ dummies_cor <- dummies %>%
   corrplot(order = 'hclust')
 
 # as expected the dummies are quite strongly correlated with the distance measures
-# distance measures are preferred for modeling
+# distance measures are preferred for modeling, hence I drop the dummies
 
 # inspect numeric features' distributions
 distributions <- data %>% 
@@ -83,11 +88,23 @@ distributions <- data %>%
   geom_density()+
   facet_wrap(~feature, scales = 'free')
 
+data %>% 
+  select_if(is.numeric) %>% 
+  select(starts_with('county_')) %>% 
+  mutate_all(log10) %>% 
+  pivot_longer(cols = everything(),
+               names_to = 'feature', 
+               values_to = 'value') %>% 
+  ggplot()+
+  aes(x = value)+
+  geom_density()+
+  facet_wrap(~feature, scales = 'free')
+
 # the strongly skewed distance features can be coerced into
 # more normal-like shape with a power-transformation
 data %>% 
   select(starts_with('dist')) %>% 
-  mutate_all(sqrt) %>% 
+  mutate_all(sqrt) %>%
   pivot_longer(cols = everything(),
                names_to = 'feature', 
                values_to = 'value') %>% 
