@@ -626,13 +626,13 @@ data_seasonal <- data %>%
             county_unemployment_rate = mean(county_unemployment_rate),
             county_unemployment_growth = mean(county_unemployment_growth),
             perc_democrats = mean(perc_democrats),
-            # perc_republicans = mean(perc_republicans),
+            perc_republicans = mean(perc_republicans),
             perc_yes_prop21 = mean(perc_yes_prop21),
             perc_yes_prop23 = mean(perc_yes_prop23),
             perc_yes_prop65 = mean(perc_yes_prop65),
             perc_yes_prop67 = mean(perc_yes_prop67),
             county_pop_growth = mean(county_pop_growth),
-            # county_persons_per_household = mean(county_persons_per_household),
+            county_persons_per_household = mean(county_persons_per_household),
             county_vacancy_rate = mean(county_vacancy_rate)) %>% 
   ungroup() %>% 
   mutate(temp_mean = (temp_min_avg + temp_max_avg)/2)

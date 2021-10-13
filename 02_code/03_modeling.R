@@ -5,7 +5,12 @@ library(tidymodels)
 
 data <- read_rds("01_data/data_final.rds") %>% 
   # turn booleans into factors for modeling
-  mutate(fire = as_factor(fire))
+  mutate(fire = as_factor(fire)) %>% 
+  # drop features
+  select(-c(perc_republicans,
+            county_persons_per_household,
+            temp_min_avg,
+            temp_max_avg))
 
 # train-/test split
 set.seed(123)

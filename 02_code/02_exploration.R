@@ -108,17 +108,3 @@ data %>%
   aes(x = value)+
   geom_density()+
   facet_wrap(~feature, scales = 'free')
-
-# data preparation --------------------------------------------------------
-
-dummies <- c("river", "lake", "recreational_routes", "campground",
-             "state_park", "picnic", "powerline", "road")
-
-distance <- c("dist_lake", "dist_power", "dist_river", "dis_road")
-
-# skewness resolve - roughly symmetric distribution - ln or box-cox
-# data reduction with PCA? - for GLM (resolve skewness and center+scale first)
-# test for variance in predictors -> % unique values < 10%?
-## ratio of most frequent to 2nd freq value ~20?
-## cause to drop variable
-
