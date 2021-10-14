@@ -74,10 +74,21 @@ glm_fit <- glm_workflow %>%
 end <- Sys.time()
 end-start
 
+show_best(glm_fit)
+collect_metrics(glm_fit)
+
+rf_testing_pred %>%                   # test set predictions
+  roc_auc(truth = class, .pred_PS)
+
+rf_testing_pred %>%                   # test set predictions
+  accuracy(truth = class, .pred_class)
+
+----- 
+
 # inspect coefficients
 glm_fit %>% 
   extract_fit_parsnip() %>% 
-  tidy() 
+  tidy()
 
 # predict with test data
 glm_preds <- predict(glm_fit, data_test)
@@ -129,16 +140,11 @@ glm_recipe <-  recipe(fire ~ ., data = data_test) %>%
   # remove 0-variance features
   step_zv(all_predictors()) %>%
   # remove highly-correlated features
-  # step_corr(all_numeric_predictors(), threshold = .9) %>%
+  step_corr(all_numeric_predictors(), threshold = .9) %>%
   # upsampling with SMOTE
-  step_smote(fire) %>%
+  step_smote(fire) #%>%
   # downsampling with TOMEK-links
   # step_tomek(fire)
-
-glm_recipe$fire %>% table()
-
-myvec <- colnames(data_test)
-names(myvec) <- colnames(test) %in% colnames(data_test)
 
 # bundle model and recipe to workflow
 glm_workflow <- workflow() %>% 
@@ -172,16 +178,16 @@ glm_aug <-
 # inspect
 glm_aug %>%
   select(fire, .pred_class, .pred_TRUE, .pred_FALSE, 
-         id, year, month)
+         id, year, season)
 
 # plot ROC curve
 glm_aug %>% 
-  roc_curve(truth = fire, .pred_TRUE) %>% 
+  roc_curve(truth = fire, .pred_FALSE) %>% 
   autoplot()
 
 # compute ROC AUC
 glm_aug %>% 
-  roc_auc(truth = fire, .pred_TRUE)
+  roc_auc(truth = fire, .pred_FALSE)
 
 # confusion matrix
 glm_confmat <- glm_aug %>% 
