@@ -109,22 +109,40 @@ summary(glm_naive_confmat,
 # GLM upsampled & resampled -----------------------------------------------
   
 # preprocessing recipe
+# glm_recipe <-  recipe(fire ~ ., data = data_train) %>% 
+#   # remove id from predictors
+#   update_role(id, new_role = "ID") %>% 
+#   # drop highly correlated features
+#   step_rm(lake, river, powerline, road,
+#           recreational_routes, starts_with('perc_yes')) %>%
+#   # upsampling with ROSE
+#   step_rose(fire, 
+#             # skip for test set
+#             skip = TRUE) %>%
+#   # turn all categorical features into dummy variables
+#   step_dummy(all_nominal_predictors()) %>%
+#   # remove 0-variance features
+#   step_zv(all_predictors()) %>%
+#   # remove highly-correlated features
+#   step_corr(all_predictors(),
+#             threshold = .9)
+
 glm_recipe <-  recipe(fire ~ ., data = data_train) %>% 
   # remove id from predictors
   update_role(id, new_role = "ID") %>% 
   # drop highly correlated features
   step_rm(lake, river, powerline, road,
           recreational_routes, starts_with('perc_yes')) %>%
-  # upsampling with ROSE
-  step_rose(fire, 
-            # skip for test set
-            skip = TRUE) %>%
   # turn all categorical features into dummy variables
   step_dummy(all_nominal_predictors()) %>%
+  # upsampling with SMOTE
+  step_smote(fire, 
+            # skip for test set
+            skip = TRUE) %>%
+  # power transformation for skewed distance features
+  step_sqrt(starts_with('dist_')) %>% 
   # remove 0-variance features
   step_zv(all_predictors()) %>%
-  # power transformation for skewed distance features
-  step_sqrt(starts_with('dist')) %>% 
   # remove highly-correlated features
   step_corr(all_predictors(),
             threshold = .9)
@@ -153,6 +171,9 @@ glm_fit <- glm_workflow %>%
                 )
 end <- Sys.time()
 end-start
+
+# write_rds(glm_fit, "03_outputs/glm_fit.rds")
+# glm_fit <- read_rds("03_outputs/glm_fit.rds")
 
 # metrics of resampled fit
 collect_metrics(glm_fit)
