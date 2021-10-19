@@ -1,5 +1,7 @@
 library(tidyverse)
 library(tidymodels)
+# require("devtools")
+# install_github("tidymodels/themis")
 library(themis)
 
 # load data ---------------------------------------------------------------
@@ -45,6 +47,67 @@ glm_model <- logistic_reg() %>%
   set_mode("classification")
 
 # GLM naive ---------------------------------------------------------------
+# specify recipe
+glm_naive_recipe <- recipe(fire ~ ., data = data_train) %>% 
+  update_role(id, new_role = "ID")
+
+# bundle model and recipe to workflow
+glm_naive_workflow <- workflow() %>% 
+  add_model(glm_model) %>% 
+  add_recipe(glm_naive_recipe)
+
+# fit model with train data
+glm_naive_fit <- glm_naive_workflow %>% 
+  fit(data = data_train)
+
+# inspect coefficients
+glm_naive_fit %>% 
+  extract_fit_parsnip() %>% 
+  tidy()
+
+# predict with test data
+glm_naive_pred <- predict(glm_naive_fit, 
+                          new_data = data_test)
+
+# number of positive predictions
+glm_naive_pred %>% 
+  pull(.pred_class) %>% 
+  table()
+
+# add predicted values and probabilities to data set
+glm_naive_aug <- 
+  augment(glm_naive_fit, data_test)
+
+# inspect
+glm_naive_aug %>%
+  select(fire, .pred_class, .pred_TRUE, .pred_FALSE, 
+         id, year, season)
+
+# plot ROC curve
+glm_naive_aug %>% 
+  roc_curve(truth = fire, .pred_FALSE) %>% 
+  autoplot()
+
+# compute ROC AUC
+glm_naive_aug %>% 
+  roc_auc(truth = fire, .pred_FALSE)
+
+# confusion matrix
+glm_naive_confmat <- glm_naive_aug %>% 
+  conf_mat(truth = fire, estimate = .pred_class)
+glm_naive_confmat
+
+# additional metrics 
+summary(glm_naive_confmat, 
+        event_level = 'second')
+
+# The model shows the typical symptoms of a heavily imbalanced data set
+# very high accuracy, but the confusion matrix shows that the model
+# is heavily overfit to negative events --> upsampling needed
+# multicollinearity also seems to be a problem --> remove highly correlated features
+
+# GLM upsampled & resampled -----------------------------------------------
+  
 # preprocessing recipe
 glm_recipe <-  recipe(fire ~ ., data = data_train) %>% 
   # remove id from predictors
@@ -52,152 +115,65 @@ glm_recipe <-  recipe(fire ~ ., data = data_train) %>%
   # drop highly correlated features
   step_rm(lake, river, powerline, road,
           recreational_routes, starts_with('perc_yes')) %>%
-  # turn all categorical features into dummy variables
-  step_dummy(all_nominal_predictors()) %>%
-  # remove 0-variance features
-  step_zv(all_predictors()) %>% 
-  step_corr(all_predictors())
-
-cv_folds <- vfold_cv(data_train, v = 10)
-control <- control_resamples(save_pred = TRUE)
-
-# bundle model and recipe to workflow
-glm_workflow <- workflow() %>% 
-  add_model(glm_model) %>% 
-  add_recipe(glm_recipe)
-
-# fit model
-start <- Sys.time()
-glm_fit <- glm_workflow %>% 
-  fit_resamples(cv_folds, 
-                control = control)
-end <- Sys.time()
-end-start
-
-show_best(glm_fit)
-collect_metrics(glm_fit)
-
-rf_testing_pred %>%                   # test set predictions
-  roc_auc(truth = class, .pred_PS)
-
-rf_testing_pred %>%                   # test set predictions
-  accuracy(truth = class, .pred_class)
-
------ 
-
-# inspect coefficients
-glm_fit %>% 
-  extract_fit_parsnip() %>% 
-  tidy()
-
-# predict with test data
-glm_preds <- predict(glm_fit, data_test)
-
-# number of positive predictions
-glm_preds %>% 
-  pull(.pred_class) %>% 
-  table()
-
-# add predicted values and probabilities to data set
-glm_aug <- 
-  augment(glm_fit, data_test)
-
-# inspect
-glm_aug %>%
-  select(fire, .pred_class, .pred_TRUE, .pred_FALSE, 
-         id, year, month)
-
-# plot ROC curve
-glm_aug %>% 
-  roc_curve(truth = fire, .pred_TRUE) %>% 
-  autoplot()
-
-# compute ROC AUC
-glm_aug %>% 
-  roc_auc(truth = fire, .pred_TRUE)
-
-# confusion matrix
-glm_confmat <- glm_aug %>% 
-  conf_mat(truth = fire, estimate = .pred_class)
-glm_confmat
-
-# additional metrics 
-summary(glm_confmat, 
-        event_level = 'second')
-
-
-# GLM upsampled -----------------------------------------------------------
-  
-# preprocessing recipe
-glm_recipe <-  recipe(fire ~ ., data = data_test) %>% 
-  # remove id from predictors
-  update_role(id, new_role = "ID") %>% 
-  # drop highly correlated features
-  step_rm(lake, river, powerline, road,
-          recreational_routes, starts_with('perc_yes')) %>%
+  # upsampling with ROSE
+  step_rose(fire, 
+            # skip for test set
+            skip = TRUE) %>%
   # turn all categorical features into dummy variables
   step_dummy(all_nominal_predictors()) %>%
   # remove 0-variance features
   step_zv(all_predictors()) %>%
+  # power transformation for skewed distance features
+  step_sqrt(starts_with('dist')) %>% 
   # remove highly-correlated features
-  step_corr(all_numeric_predictors(), threshold = .9) %>%
-  # upsampling with SMOTE
-  step_smote(fire) #%>%
-  # downsampling with TOMEK-links
-  # step_tomek(fire)
+  step_corr(all_predictors(),
+            threshold = .9)
+
+# create splits for 10-fold CV resampling
+cv_splits <- vfold_cv(data_train, 
+                      v = 10)
 
 # bundle model and recipe to workflow
 glm_workflow <- workflow() %>% 
   add_model(glm_model) %>% 
   add_recipe(glm_recipe)
 
+# specify metrics
+metrics <- metric_set(roc_auc, f_meas, sens, spec, accuracy)
+
 # fit model
 start <- Sys.time()
 glm_fit <- glm_workflow %>% 
-  fit(data = data_train)
+  fit_resamples(resamples = cv_splits, 
+                metrics = metrics, 
+                control = control_resamples(
+                  verbose = TRUE,
+                  save_pred = TRUE,
+                  event_level = "second")
+                )
 end <- Sys.time()
 end-start
 
-# inspect coefficients
-glm_fit %>% 
-  extract_fit_parsnip() %>% 
-  tidy() 
+# metrics of resampled fit
+collect_metrics(glm_fit)
 
-# predict with test data
-glm_preds <- predict(glm_fit, data_test)
-
-# number of positive predictions
-glm_preds %>% 
-  pull(.pred_class) %>% 
-  table()
-
-# add predicted values and probabilities to data set
-glm_aug <- 
-  augment(glm_fit, data_test)
-
-# inspect
-glm_aug %>%
-  select(fire, .pred_class, .pred_TRUE, .pred_FALSE, 
-         id, year, season)
+# within-fold predictions
+glm_preds <- collect_predictions(glm_fit, 
+                    summarize = TRUE)
 
 # plot ROC curve
-glm_aug %>% 
+glm_preds %>% 
   roc_curve(truth = fire, .pred_FALSE) %>% 
   autoplot()
 
-# compute ROC AUC
-glm_aug %>% 
-  roc_auc(truth = fire, .pred_FALSE)
-
 # confusion matrix
-glm_confmat <- glm_aug %>% 
+glm_confmat <- glm_preds %>% 
   conf_mat(truth = fire, estimate = .pred_class)
 glm_confmat
 
 # additional metrics 
 summary(glm_confmat, 
         event_level = 'second')
-
 
 # GLMnet ------------------------------------------------------------------
 
@@ -271,5 +247,3 @@ summary(rf_confmat,
 
 
 # Stacking ----------------------------------------------------------------
-
-
