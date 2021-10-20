@@ -35,11 +35,20 @@ data <- read_rds("01_data/data_seasonal.rds") %>%
 #                                strata = fire, 
 #                                prop = 0.7)
 
-data_train <- data %>% 
-  filter(year <= 2016)
+# time-based train/test split
+n_train <- data %>% 
+  mutate(train = if_else(year <= 2016, TRUE, FALSE)) %>% 
+  pull(train) %>% 
+  sum()
 
-data_test <- data %>% 
-  filter(year > 2016)
+prop <- n_train/ nrow(data)
+
+t_split <- initial_time_split(data %>% arrange(year), 
+                              prop = prop)
+
+data_train <- training(t_split)
+data_test <- testing(t_split)
+
 
 # specify model
 glm_model <- logistic_reg() %>% 
@@ -156,8 +165,16 @@ glm_workflow <- workflow() %>%
   add_model(glm_model) %>% 
   add_recipe(glm_recipe)
 
+# set up parallel-processing backend
+all_cores <- parallel::detectCores(logical = FALSE)
+
+library(doParallel)
+cl <- makePSOCKcluster(all_cores)
+registerDoParallel(cl)
+
 # specify metrics
-metrics <- metric_set(roc_auc, f_meas, sens, spec, accuracy)
+metrics <- metric_set(roc_auc, accuracy, sens, spec, 
+                      f_meas, precision, recall)
 
 # fit model
 start <- Sys.time()
@@ -167,7 +184,9 @@ glm_fit <- glm_workflow %>%
                 control = control_resamples(
                   verbose = TRUE,
                   save_pred = TRUE,
-                  event_level = "second")
+                  event_level = "second", 
+                  allow_par = TRUE, 
+                  parallel_over = 'resamples')
                 )
 end <- Sys.time()
 end-start
@@ -178,7 +197,7 @@ end-start
 # metrics of resampled fit
 collect_metrics(glm_fit)
 
-# within-fold predictions
+# summarize within-fold predictions
 glm_preds <- collect_predictions(glm_fit, 
                     summarize = TRUE)
 
@@ -238,26 +257,58 @@ elanet_grid <- grid_regular(penalty(),
                             levels = 5)
 
 # tune with 10-fold CV
+start <- Sys.time()
 elanet_tune <- elanet_wf %>% 
   tune_grid(
     resamples = cv_splits,
     grid = elanet_grid,
+    metrics = metrics, 
     control = control_grid(save_pred = TRUE, 
                            verbose = TRUE, 
-                           event_level = 'second')
+                           event_level = 'second', 
+                           allow_par = TRUE, 
+                           parallel_over = 'resamples'), 
   )
+end <- Sys.time()
+end-start
 
 # write_rds(elanet_tune, "03_outputs/elanet_tune.rds")
 # elanet_tune <- read_rds("03_outputs/elanet_tune.rds")
 
+# show metrics
+collect_metrics(elanet_tune)
+show_best(elanet_tune, "f_meas")
+show_best(elanet_tune, "roc_auc") %>% View()
+
+# select best tuning specification
+best_elanet <- select_best(elanet_tune, "f_meas")
+
+# finalize workflow with best tuning parameters
+final_elanet_wf <- elanet_wf %>% 
+  finalize_workflow(best_elanet)
+
+# fit final elanet model
+final_elanet_fit <- final_elanet_wf %>%
+  last_fit(split = t_split, 
+           metrics = metrics)
+
+# metrics
+final_elanet_fit %>%
+  collect_metrics()
+
+# ROC curve
+final_elanet_fit %>%
+  collect_predictions() %>% 
+  roc_curve(fire, .pred_FALSE) %>% 
+  autoplot()
 
 # SVM ---------------------------------------------------------------------
 
 
 # Random Forest -----------------------------------------------------------
 # specify model
-rf_model <- rand_forest(mtry = 3, 
-                         min_n = 3, 
+rf_model <- rand_forest(mtry = tune(), 
+                         min_n = tune(), 
                          trees = 1000) %>% 
   set_engine("ranger") %>% 
   set_mode("classification")
@@ -265,6 +316,8 @@ rf_model <- rand_forest(mtry = 3,
 # preprocessing recipe
 rf_recipe <- recipe(fire ~ ., data = data) %>% 
   update_role(id, season, new_role = "ID")
+
+
 
 # bundle model and recipe to workflow
 rf_workflow <- workflow() %>% 
