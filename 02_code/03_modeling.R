@@ -197,10 +197,59 @@ summary(glm_confmat,
         event_level = 'second')
 
 # GLMnet ------------------------------------------------------------------
+# define model
+elanet_model <- 
+  logistic_reg(penalty = tune(), 
+               mixture = tune()) %>% 
+  set_engine("glmnet") %>% 
+  set_mode("classification")
 
-%>% 
+# create recipe
+elanet_recipe <-  recipe(fire ~ ., data = data_train) %>% 
+  # remove id from predictors
+  update_role(id, new_role = "ID") %>% 
+  # drop highly correlated features
+  step_rm(lake, river, powerline, road,
+          recreational_routes, starts_with('perc_yes')) %>%
+  # turn all categorical features into dummy variables
+  step_dummy(all_nominal_predictors()) %>%
+  # upsampling with SMOTE
+  step_smote(fire, 
+             # skip for test set
+             skip = TRUE) %>%
+  # power transformation for skewed distance features
+  step_sqrt(starts_with('dist_')) %>% 
+  # remove 0-variance features
+  step_zv(all_predictors()) %>%
+  # remove highly-correlated features
+  step_corr(all_predictors(),
+            threshold = .9) %>% 
   # normalize all features
   step_normalize(all_numeric_predictors())
+
+# combine model specification & recipe to workflow
+elanet_wf <- workflow() %>% 
+  add_model(elanet_model) %>% 
+  add_recipe(elanet_recipe)
+
+# set up tuning grid
+elanet_grid <- grid_regular(penalty(),
+                            mixture(),
+                            levels = 5)
+
+# tune with 10-fold CV
+elanet_tune <- elanet_wf %>% 
+  tune_grid(
+    resamples = cv_splits,
+    grid = elanet_grid,
+    control = control_grid(save_pred = TRUE, 
+                           verbose = TRUE, 
+                           event_level = 'second')
+  )
+
+# write_rds(elanet_tune, "03_outputs/elanet_tune.rds")
+# elanet_tune <- read_rds("03_outputs/elanet_tune.rds")
+
 
 # SVM ---------------------------------------------------------------------
 
