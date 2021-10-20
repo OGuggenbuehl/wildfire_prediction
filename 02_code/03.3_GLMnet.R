@@ -1,5 +1,6 @@
-# define model
+# specify model
 elanet_model <- 
+  # enable tuning of hyperparameters
   logistic_reg(penalty = tune(), 
                mixture = tune()) %>% 
   set_engine("glmnet") %>% 
@@ -32,6 +33,17 @@ elanet_recipe <-  recipe(fire ~ ., data = data_train) %>%
 elanet_wf <- workflow() %>% 
   add_model(elanet_model) %>% 
   add_recipe(elanet_recipe)
+
+# set up parallel-processing backend
+all_cores <- parallel::detectCores(logical = FALSE)
+
+library(doParallel)
+cl <- makePSOCKcluster(all_cores)
+registerDoParallel(cl)
+
+# specify metrics
+metrics <- metric_set(roc_auc, accuracy, sens, spec, 
+                      f_meas, precision, recall)
 
 # set up tuning grid
 elanet_grid <- grid_regular(penalty(),

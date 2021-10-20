@@ -1,22 +1,9 @@
-# preprocessing recipe
-# glm_recipe <-  recipe(fire ~ ., data = data_train) %>% 
-#   # remove id from predictors
-#   update_role(id, new_role = "ID") %>% 
-#   # drop highly correlated features
-#   step_rm(lake, river, powerline, road,
-#           recreational_routes, starts_with('perc_yes')) %>%
-#   # upsampling with ROSE
-#   step_rose(fire, 
-#             # skip for test set
-#             skip = TRUE) %>%
-#   # turn all categorical features into dummy variables
-#   step_dummy(all_nominal_predictors()) %>%
-#   # remove 0-variance features
-#   step_zv(all_predictors()) %>%
-#   # remove highly-correlated features
-#   step_corr(all_predictors(),
-#             threshold = .9)
+# specify model
+glm_model <- logistic_reg() %>% 
+  set_engine("glm") %>% 
+  set_mode("classification")
 
+# preprocessing recipe
 glm_recipe <-  recipe(fire ~ ., data = data_train) %>% 
   # remove id from predictors
   update_role(id, new_role = "ID") %>% 

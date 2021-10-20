@@ -1,4 +1,9 @@
-# specify recipe
+# specify model
+glm_model <- logistic_reg() %>% 
+  set_engine("glm") %>% 
+  set_mode("classification")
+
+# preprocessing recipe
 glm_naive_recipe <- recipe(fire ~ ., data = data_train) %>% 
   update_role(id, new_role = "ID")
 

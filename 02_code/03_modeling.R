@@ -18,7 +18,7 @@ data <- read_rds("01_data/data_seasonal.rds") %>%
             county_unemployment_rate)) %>% 
   mutate_if(is.logical, as.numeric)
 
-# train-/test split
+# Randomized train/test split ---------------------------------------------
 # set.seed(123)
 # splits <- initial_split(data,
 #                         # set split proportion
@@ -35,7 +35,8 @@ data <- read_rds("01_data/data_seasonal.rds") %>%
 #                                strata = fire, 
 #                                prop = 0.7)
 
-# time-based train/test split
+
+# time-based train/test split ---------------------------------------------
 n_train <- data %>% 
   mutate(train = if_else(year <= 2016, TRUE, FALSE)) %>% 
   pull(train) %>% 
@@ -48,12 +49,6 @@ t_split <- initial_time_split(data %>% arrange(year),
 
 data_train <- training(t_split)
 data_test <- testing(t_split)
-
-
-# specify model
-glm_model <- logistic_reg() %>% 
-  set_engine("glm") %>% 
-  set_mode("classification")
 
 # GLM naive ---------------------------------------------------------------
 source("02_code/03.1_GLM_naive.R")

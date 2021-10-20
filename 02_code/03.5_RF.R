@@ -1,5 +1,7 @@
 # specify model
-rf_model <- rand_forest(mtry = tune(), 
+rf_model <- 
+  # enable tuning of hyperparameters
+  rand_forest(mtry = tune(), 
                         min_n = tune(), 
                         trees = 1000) %>% 
   set_engine("ranger") %>% 
@@ -7,7 +9,19 @@ rf_model <- rand_forest(mtry = tune(),
 
 # preprocessing recipe
 rf_recipe <- recipe(fire ~ ., data = data) %>% 
-  update_role(id, season, new_role = "ID")
+  update_role(id, season, new_role = "ID") %>% 
+  # drop highly correlated features
+  step_rm(lake, river, powerline, road,
+          recreational_routes, starts_with('perc_yes')) %>%
+  # upsampling with SMOTE
+  step_smote(fire, 
+             # skip for test set
+             skip = TRUE) %>%
+  # remove 0-variance features
+  step_zv(all_predictors()) %>%
+  # remove highly-correlated features
+  step_corr(all_predictors(),
+            threshold = .9)
 
 
 
