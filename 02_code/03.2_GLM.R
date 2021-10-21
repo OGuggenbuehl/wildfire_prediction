@@ -21,12 +21,8 @@ glm_recipe <-  recipe(fire ~ ., data = data_train) %>%
   # remove 0-variance features
   step_zv(all_predictors()) %>%
   # remove highly-correlated features
-  step_corr(all_predictors(),
+  step_corr(all_numeric_predictors(),
             threshold = .9)
-
-# create splits for 10-fold CV resampling
-cv_splits <- vfold_cv(data_train, 
-                      v = 10)
 
 # bundle model and recipe to workflow
 glm_workflow <- workflow() %>% 
@@ -39,6 +35,10 @@ all_cores <- parallel::detectCores(logical = FALSE)
 library(doParallel)
 cl <- makePSOCKcluster(all_cores)
 registerDoParallel(cl)
+
+# create splits for 10-fold CV resampling
+cv_splits <- vfold_cv(data_train, 
+                      v = 10)
 
 # specify metrics
 metrics <- metric_set(roc_auc, accuracy, sens, spec, 
