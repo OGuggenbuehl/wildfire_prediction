@@ -1,17 +1,13 @@
 library(ranger)
 
 # specify model
-rf_model <- 
-  # enable tuning of hyperparameters
-  rand_forest(mtry = 5, 
-              min_n = 50, 
-              trees = 1000) %>% 
+rf_model <- rand_forest() %>% 
   set_engine("ranger") %>% 
   set_mode("classification")
 
 # preprocessing recipe
-rf_recipe <- recipe(fire ~ ., data = data) %>% 
-  update_role(id, season, new_role = "ID") %>% 
+rf_recipe <- recipe(fire ~ ., data = data_train) %>% 
+  update_role(id, new_role = "ID") %>% 
   # drop highly correlated features
   step_rm(lake, river, powerline, road,
           recreational_routes, starts_with('perc_yes')) %>% 
@@ -37,9 +33,9 @@ library(doParallel)
 cl <- makePSOCKcluster(all_cores)
 registerDoParallel(cl)
 
-# create splits for 10-fold CV resampling
+# create splits for 5-fold CV resampling
 cv_splits <- vfold_cv(data_train, 
-                      v = 10)
+                      v = 5)
 
 # specify metrics
 metrics <- metric_set(roc_auc, accuracy, sens, spec, 
@@ -47,7 +43,7 @@ metrics <- metric_set(roc_auc, accuracy, sens, spec,
 
 # fit model
 start <- Sys.time()
-rf_fit <- rf_workflow %>% 
+rf_res <- rf_workflow %>% 
   fit_resamples(resamples = cv_splits, 
                 metrics = metrics, 
                 control = control_resamples(
@@ -60,14 +56,14 @@ rf_fit <- rf_workflow %>%
 end <- Sys.time()
 end-start
 
-# write_rds(rf_fit, "03_outputs/RF_res.rds")
-rf_fit <- read_rds("03_outputs/RF_res.rds")
+# write_rds(rf_res, "03_outputs/RF_res.rds")
+rf_res <- read_rds("03_outputs/RF_res.rds")
 
 # metrics of resampled fit
-collect_metrics(rf_fit)
+collect_metrics(rf_res)
 
 # summarize within-fold predictions
-rf_preds <- collect_predictions(rf_fit, 
+rf_preds <- collect_predictions(rf_res, 
                                 summarize = TRUE)
 
 # plot ROC curve

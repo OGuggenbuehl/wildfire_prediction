@@ -4,21 +4,21 @@ library(ranger)
 rf_model <- 
   # enable tuning of hyperparameters
   rand_forest(mtry = tune(), 
-              min_n = tune(), 
+              min_n = tune(),
               trees = 1000) %>% 
   set_engine("ranger") %>% 
   set_mode("classification")
 
 # preprocessing recipe
-rf_recipe <- recipe(fire ~ ., data = data) %>% 
-  update_role(id, season, new_role = "ID") %>% 
+rf_recipe <- recipe(fire ~ ., data = data_train) %>% 
+  update_role(id, new_role = "ID") %>% 
   # drop highly correlated features
   step_rm(lake, river, powerline, road,
           recreational_routes, starts_with('perc_yes')) %>%
   # upsampling with ROSE
   step_rose(fire, 
-             # skip for test set
-             skip = TRUE) %>%
+            # skip for test set
+            skip = TRUE) %>%
   # remove 0-variance features
   step_zv(all_predictors())%>%
   # remove highly-correlated features
@@ -43,20 +43,19 @@ metrics <- metric_set(roc_auc, accuracy, sens, spec,
 
 # create splits for 10-fold CV resampling
 cv_splits <- vfold_cv(data_train, 
-                      v = 10)
+                      v = 5)
 
-# set up tuning grid
-rf_grid <- rf_model %>%
-  parameters() %>%
-  finalize(select(data_train, -fire)) %>%  
-  grid_max_entropy(size = 25)
+# inspect model and tuning parameters
+rf_model %>%    
+  parameters() 
 
 # tune with 10-fold CV
 start <- Sys.time()
 rf_tune <- rf_workflow %>% 
+  # set up tuning grid
   tune_grid(
     resamples = cv_splits,
-    grid = rf_grid,
+    grid = 10,
     metrics = metrics, 
     control = control_grid(save_pred = TRUE, 
                            verbose = TRUE, 
@@ -66,3 +65,32 @@ rf_tune <- rf_workflow %>%
   )
 end <- Sys.time()
 end-start
+
+write_rds(rf_tune, "03_outputs/rf_tuned.rds")
+
+# show metrics
+collect_metrics(rf_tune)
+show_best(rf_tune, "f_meas")
+show_best(rf_tune, "roc_auc")
+
+# select best tuning specification
+best_rf <- select_best(rf_tune, "f_meas")
+
+# finalize workflow with best tuning parameters
+final_rf_wf <- rf_workflow %>% 
+  finalize_workflow(best_rf)
+
+# fit final RF model
+final_rf_fit <- final_rf_wf %>%
+  last_fit(split = t_split, 
+           metrics = metrics)
+
+# metrics
+final_rf_fit %>%
+  collect_metrics()
+
+# ROC curve
+final_rf_fit %>%
+  collect_predictions() %>% 
+  roc_curve(fire, .pred_FALSE) %>% 
+  autoplot()
