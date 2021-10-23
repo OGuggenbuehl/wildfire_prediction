@@ -107,6 +107,13 @@
       "Repository": "CRAN",
       "Hash": "dab19adae4440ae55aa8a9d238b246bb"
     },
+    "RcppEigen": {
+      "Package": "RcppEigen",
+      "Version": "0.3.3.9.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "ddfa72a87fdf4c80466a20818be91d00"
+    },
     "SQUAREM": {
       "Package": "SQUAREM",
       "Version": "2021.1",
@@ -814,6 +821,13 @@
       "Repository": "CRAN",
       "Hash": "97def703420c8ab10d8f0e6c72101e02"
     },
+    "ranger": {
+      "Package": "ranger",
+      "Version": "0.13.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "420a2d7a05923e33bbdf5b67eaebbfe5"
+    },
     "rappdirs": {
       "Package": "rappdirs",
       "Version": "0.3.3",
@@ -1119,6 +1133,13 @@
       "Source": "Repository",
       "Repository": "CRAN",
       "Hash": "a270216f7ffda25e53298293046d1d05"
+    },
+    "xgboost": {
+      "Package": "xgboost",
+      "Version": "1.4.1.1",
+      "Source": "Repository",
+      "Repository": "CRAN",
+      "Hash": "42f892dcb079756f28754cf67b37fa6d"
     },
     "xml2": {
       "Package": "xml2",
