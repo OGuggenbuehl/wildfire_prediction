@@ -36,20 +36,8 @@ elanet_wf <- workflow() %>%
   add_model(elanet_model) %>% 
   add_recipe(elanet_recipe)
 
-# set up parallel-processing backend
-all_cores <- parallel::detectCores(logical = FALSE)
-
-library(doParallel)
-cl <- makePSOCKcluster(all_cores)
+# register parallel-processing backend
 registerDoParallel(cl)
-
-# create splits for 10-fold CV resampling
-cv_splits <- vfold_cv(data_train, 
-                      v = 10)
-
-# specify metrics
-metrics <- metric_set(roc_auc, accuracy, sens, spec, 
-                      f_meas, precision, recall)
 
 # set up tuning grid
 elanet_grid <- grid_regular(penalty(),

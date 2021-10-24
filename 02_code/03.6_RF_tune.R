@@ -30,26 +30,14 @@ rf_workflow <- workflow() %>%
   add_model(rf_model) %>% 
   add_recipe(rf_recipe)
 
-# set up parallel-processing backend
-all_cores <- parallel::detectCores(logical = FALSE)
-
-library(doParallel)
-cl <- makePSOCKcluster(all_cores)
+# register parallel-processing backend
 registerDoParallel(cl)
-
-# specify metrics
-metrics <- metric_set(roc_auc, accuracy, sens, spec, 
-                      f_meas, precision, recall)
-
-# create splits for 10-fold CV resampling
-cv_splits <- vfold_cv(data_train, 
-                      v = 5)
 
 # inspect model and tuning parameters
 rf_model %>%    
   parameters() 
 
-# tune with 10-fold CV
+# tune with 5-fold CV
 start <- Sys.time()
 rf_tune <- rf_workflow %>% 
   # set up tuning grid

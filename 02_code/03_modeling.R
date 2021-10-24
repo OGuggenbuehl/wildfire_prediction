@@ -3,6 +3,7 @@ library(tidymodels)
 # require("devtools")
 # install_github("tidymodels/themis")
 library(themis)
+library(doParallel)
 
 # load data ---------------------------------------------------------------
 
@@ -49,6 +50,21 @@ t_split <- initial_time_split(data %>% arrange(year),
 
 data_train <- training(t_split)
 data_test <- testing(t_split)
+
+# Modeling Setup ----------------------------------------------------------
+
+set.seed(123)
+# create splits for 5-fold CV resampling
+cv_splits <- vfold_cv(data_train, 
+                      v = 5)
+
+# specify metrics
+metrics <- metric_set(roc_auc, accuracy, sens, spec, 
+                      f_meas, precision, recall)
+
+# set up parallel-processing backend
+all_cores <- parallel::detectCores(logical = FALSE)
+cl <- makePSOCKcluster(all_cores)
 
 # GLM naive ---------------------------------------------------------------
 source("02_code/03.1_GLM_naive.R")
