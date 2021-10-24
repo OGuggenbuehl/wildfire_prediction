@@ -5,7 +5,7 @@ rf_model <-
   # enable tuning of hyperparameters
   rand_forest(mtry = tune(), 
               min_n = tune(),
-              trees = 1000) %>% 
+              trees = 500) %>% 
   set_engine("ranger") %>% 
   set_mode("classification")
 
@@ -55,42 +55,60 @@ rf_tune <- rf_workflow %>%
   # set up tuning grid
   tune_grid(
     resamples = cv_splits,
-    grid = 10,
+    grid = 20,
     metrics = metrics, 
     control = control_grid(save_pred = TRUE, 
                            verbose = TRUE, 
                            event_level = 'second', 
                            allow_par = TRUE, 
-                           parallel_over = 'resamples'), 
+                           parallel_over = 'resamples')
   )
 end <- Sys.time()
 end-start
 
-write_rds(rf_tune, "03_outputs/rf_tuned.rds")
+# write_rds(rf_tune, "03_outputs/rf_tuned.rds")
+rf_tune <- read_rds("03_outputs/rf_tuned.rds")
 
 # show metrics
 collect_metrics(rf_tune)
 show_best(rf_tune, "f_meas")
 show_best(rf_tune, "roc_auc")
 
+# manually create tuning grid based on these results
+rf_grid <- grid_regular(mtry(range = c(2, 10)),
+             min_n(range = c(4, 16)), 
+             levels = 5)
+
+set.seed(123)
+rf_tune_manual <- tune_grid(
+  resamples = cv_splits,
+  grid = rf_grid,
+  metrics = metrics, 
+  control = control_grid(save_pred = TRUE, 
+                         verbose = TRUE, 
+                         event_level = 'second', 
+                         allow_par = TRUE, 
+                         parallel_over = 'resamples')
+)
+
 # select best tuning specification
-best_rf <- select_best(rf_tune, "f_meas")
+best_rf <- select_best(rf_tune_manual, "f_meas")
 
 # finalize workflow with best tuning parameters
-final_rf_wf <- rf_workflow %>% 
+best_rf_wf <- rf_workflow %>% 
   finalize_workflow(best_rf)
 
 # fit final RF model
-final_rf_fit <- final_rf_wf %>%
+rf_fit_final <- best_rf_wf %>%
   last_fit(split = t_split, 
            metrics = metrics)
 
 # metrics
-final_rf_fit %>%
+rf_fit_final %>%
   collect_metrics()
 
 # ROC curve
-final_rf_fit %>%
+rf_fit_final %>%
   collect_predictions() %>% 
   roc_curve(fire, .pred_FALSE) %>% 
   autoplot()
