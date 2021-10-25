@@ -51,11 +51,7 @@ xgb_tune <- xgb_workflow %>%
     resamples = cv_splits,
     grid = 20,
     metrics = metrics, 
-    control = control_grid(save_pred = TRUE, 
-                           verbose = TRUE, 
-                           event_level = 'second', 
-                           allow_par = TRUE, 
-                           parallel_over = 'resamples')
+    control = control
   )
 end <- Sys.time()
 end-start

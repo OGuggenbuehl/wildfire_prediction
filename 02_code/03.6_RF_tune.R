@@ -15,7 +15,9 @@ rf_recipe <- recipe(fire ~ ., data = data_train) %>%
   # drop highly correlated features
   step_rm(lake, river, powerline, road,
           recreational_routes, starts_with('perc_yes')) %>%
-  # upsampling with ROSE
+  # drop ID variable only for training set for TOMEK
+  step_rm(id, skip = TRUE) %>% 
+  # downsampling with ROSE
   step_rose(fire, 
             # skip for test set
             skip = TRUE) %>%
@@ -45,11 +47,7 @@ rf_tune <- rf_workflow %>%
     resamples = cv_splits,
     grid = 20,
     metrics = metrics, 
-    control = control_grid(save_pred = TRUE, 
-                           verbose = TRUE, 
-                           event_level = 'second', 
-                           allow_par = TRUE, 
-                           parallel_over = 'resamples')
+    control = control
   )
 end <- Sys.time()
 end-start
@@ -63,24 +61,25 @@ show_best(rf_tune, "f_meas")
 show_best(rf_tune, "roc_auc")
 
 # manually create tuning grid based on these results
-rf_grid <- grid_regular(mtry(range = c(2, 10)),
-             min_n(range = c(4, 16)), 
-             levels = 5)
+rf_grid <- grid_regular(mtry(range = c(2, 12)),
+                        min_n(range = c(2, 14)), 
+                        levels = 5)
 
-set.seed(123)
-rf_tune_manual <- tune_grid(
+rf_tune_manual <- rf_workflow %>% 
+  tune_grid(
   resamples = cv_splits,
   grid = rf_grid,
   metrics = metrics, 
-  control = control_grid(save_pred = TRUE, 
-                         verbose = TRUE, 
-                         event_level = 'second', 
-                         allow_par = TRUE, 
-                         parallel_over = 'resamples')
+  control = control
 )
 
+# show metrics
+collect_metrics(rf_tune_manual)
+show_best(rf_tune_manual, "f_meas")
+show_best(rf_tune_manual, "roc_auc")
+
 # select best tuning specification
-best_rf <- select_best(rf_tune_manual, "f_meas")
+best_rf <- select_best(rf_tune_manual, "roc_auc")
 
 # finalize workflow with best tuning parameters
 best_rf_wf <- rf_workflow %>% 

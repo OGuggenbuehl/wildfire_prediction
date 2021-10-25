@@ -36,12 +36,7 @@ start <- Sys.time()
 xgb_res <- xgb_workflow %>% 
   fit_resamples(resamples = cv_splits, 
                 metrics = metrics, 
-                control = control_resamples(
-                  verbose = TRUE,
-                  save_pred = TRUE,
-                  event_level = "second", 
-                  allow_par = TRUE, 
-                  parallel_over = 'resamples')
+                control = control
   )
 end <- Sys.time()
 end-start

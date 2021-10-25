@@ -4,6 +4,7 @@ library(tidymodels)
 # install_github("tidymodels/themis")
 library(themis)
 library(doParallel)
+options(tidymodels.dark = TRUE)
 
 # load data ---------------------------------------------------------------
 
@@ -61,26 +62,36 @@ cv_splits <- vfold_cv(data_train,
 # specify metrics
 metrics <- metric_set(roc_auc, accuracy, sens, spec, 
                       f_meas, precision, recall)
+# fit control
+control <- control_resamples(
+  verbose = TRUE,
+  save_pred = TRUE,
+  event_level = "second", 
+  allow_par = TRUE, 
+  parallel_over = 'resamples')
 
 # set up parallel-processing backend
 all_cores <- parallel::detectCores(logical = FALSE)
 cl <- makePSOCKcluster(all_cores)
 
-# GLM naive ---------------------------------------------------------------
+# GLM ---------------------------------------------------------------------
+# naive
 source("02_code/03.1_GLM_naive.R")
-
-# GLM upsampled & resampled -----------------------------------------------
+# upsampled & resampled
 source("02_code/03.2_GLM_up_resampled.R")
-
-# GLMnet ------------------------------------------------------------------
+# tuned elastic net
 source("02_code/03.3_GLMnet.R")
 
-# SVM ---------------------------------------------------------------------
-
 # Random Forest -----------------------------------------------------------
+# naive 
 source("02_code/03.5_RF_naive.R")
+# tuned
+source("02_code/03.5_RF_tune.R")
 
 # XGB ---------------------------------------------------------------------
-
+# naive
+source("02_code/03.7_xgb_naive.R")
+# tune
+source("02_code/03.6_RF_tune.R")
 
 # Stacking ----------------------------------------------------------------
