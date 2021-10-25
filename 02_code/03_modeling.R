@@ -84,13 +84,13 @@ source("02_code/03.3_GLMnet.R")
 
 # Random Forest -----------------------------------------------------------
 # naive 
-source("02_code/03.5_RF_naive.R")
+source("02_code/03.5_RF_res.R")
 # tuned
 source("02_code/03.5_RF_tune.R")
 
 # XGB ---------------------------------------------------------------------
 # naive
-source("02_code/03.7_xgb_naive.R")
+source("02_code/03.7_xgb_res.R")
 # tune
 source("02_code/03.6_RF_tune.R")
 
