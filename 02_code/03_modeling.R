@@ -60,8 +60,9 @@ cv_splits <- vfold_cv(data_train,
                       v = 5)
 
 # specify metrics
-metrics <- metric_set(roc_auc, accuracy, sens, spec, 
-                      f_meas, precision, recall)
+metrics <- metric_set(mn_log_loss, f_meas, 
+                      precision, recall,
+                      accuracy, roc_auc)
 # fit control
 control <- control_resamples(
   verbose = TRUE,
