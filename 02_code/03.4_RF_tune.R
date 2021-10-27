@@ -66,11 +66,12 @@ rf_tune <- read_rds("03_outputs/rf_tuned.rds")
 # show metrics
 collect_metrics(rf_tune)
 show_best(rf_tune, "f_meas")
+show_best(rf_tune, "mn_log_loss")
 show_best(rf_tune, "roc_auc")
 
 # manually create tuning grid based on these results
-rf_grid <- grid_regular(mtry(range = c(2, 12)),
-                        min_n(range = c(2, 14)), 
+rf_grid <- grid_regular(mtry(range = c(12, 36)),
+                        min_n(range = c(3, 15)), 
                         levels = 5)
 
 rf_tune_manual <- rf_workflow %>% 
@@ -85,9 +86,10 @@ rf_tune_manual <- rf_workflow %>%
 collect_metrics(rf_tune_manual)
 show_best(rf_tune_manual, "f_meas")
 show_best(rf_tune_manual, "roc_auc")
+show_best(rf_tune_manual, "mn_log_loss")
 
 # select best tuning specification
-best_rf <- select_best(rf_tune_manual, "roc_auc")
+best_rf <- select_best(rf_tune_manual, "mn_log_loss")
 
 # finalize workflow with best tuning parameters
 best_rf_wf <- rf_workflow %>% 

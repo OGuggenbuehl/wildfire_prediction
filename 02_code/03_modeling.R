@@ -76,23 +76,22 @@ all_cores <- parallel::detectCores(logical = FALSE)
 cl <- makePSOCKcluster(all_cores)
 
 # GLM ---------------------------------------------------------------------
-# naive
-source("02_code/03.1_GLM_naive.R")
 # upsampled & resampled
-source("02_code/03.2_GLM_up_resampled.R")
+source("02_code/03.1_GLM_res.R")
 # tuned elastic net
-source("02_code/03.3_GLMnet.R")
+source("02_code/03.2_GLM_tune.R")
 
 # Random Forest -----------------------------------------------------------
-# naive 
-source("02_code/03.5_RF_res.R")
+# upsampled & resampled
+source("02_code/03.3_RF_res.R")
 # tuned
-source("02_code/03.5_RF_tune.R")
+source("02_code/03.4_RF_tune.R")
 
 # XGB ---------------------------------------------------------------------
-# naive
-source("02_code/03.7_xgb_res.R")
+# upsampled & resampled
+source("02_code/03.5_xgb_res.R")
 # tune
-source("02_code/03.6_RF_tune.R")
+source("02_code/03.6_xgb_tune.R")
 
 # Stacking ----------------------------------------------------------------
+source("02_code/03.7_stacks.R")
