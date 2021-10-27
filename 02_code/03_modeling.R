@@ -18,7 +18,11 @@ data <- read_rds("01_data/data_seasonal.rds") %>%
             temp_max_avg,
             county_unemployment, 
             county_unemployment_rate)) %>% 
-  mutate_if(is.logical, as.numeric)
+  mutate_if(is.logical, as.numeric) %>% 
+  mutate(fire = recode(fire, 
+                       'TRUE' = 'fire', 
+                       'FALSE' = 'none'),
+         fire = fct_relevel(fire, c('fire', 'none')))
 
 # Randomized train/test split ---------------------------------------------
 # set.seed(123)
@@ -62,12 +66,13 @@ cv_splits <- vfold_cv(data_train,
 # specify metrics
 metrics <- metric_set(mn_log_loss, f_meas, 
                       precision, recall,
+                      sensitivity, specificity,
                       accuracy, roc_auc)
 # fit control
 control <- control_resamples(
   verbose = TRUE,
   save_pred = TRUE,
-  event_level = "second", 
+  # event_level = "second", 
   allow_par = TRUE, 
   parallel_over = 'resamples')
 
