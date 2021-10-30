@@ -123,7 +123,7 @@ collect_metrics(xgb_res_down)
 
 # summarize within-fold predictions
 xgb_preds_down <- collect_predictions(xgb_res_down, 
-                                    summarize = TRUE)
+                                      summarize = TRUE)
 
 # plot ROC curve
 xgb_preds_down %>% 

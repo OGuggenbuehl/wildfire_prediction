@@ -36,7 +36,7 @@ xgb_recipe_up <- recipe(fire ~ ., data = data_train) %>%
 # bundle model and recipe to workflow
 xgb_workflow_up <- workflow() %>% 
   add_model(xgb_model) %>% 
-  add_recipe(xgb_recipe)
+  add_recipe(xgb_recipe_up)
 
 # register parallel-processing backend
 registerDoParallel(cl)
@@ -62,16 +62,21 @@ write_rds(xgb_tune_up, "03_outputs/xgb_tuned_upsampled.rds")
 xgb_tune_up <- read_rds("03_outputs/xgb_tuned_upsampled.rds")
 
 # show metrics
-collect_metrics(xgb_tune_up) 
-show_best(xgb_tune_up, "f_meas")
-show_best(xgb_tune_up, "roc_auc")
+collect_metrics(xgb_tune_up) %>% 
+  select(-c(n, std_err, .config)) %>% 
+  pivot_wider(names_from = .metric, values_from = mean) %>% View()
+
+show_best(xgb_tune_up, "f_meas") %>% select(.metric, mean)
+show_best(xgb_tune_up, "roc_auc") %>% select(.metric, mean)
+show_best(xgb_tune_up, "precision") %>% select(.metric, mean)
+show_best(xgb_tune_up, "recall") %>% select(.metric, mean)
 
 # select best tuning specification
 best_xgb_up <- select_best(xgb_tune_up, "f_meas")
 
 # finalize workflow with best tuning parameters
 best_xgb_wf_up <- xgb_workflow_up %>% 
-  finalize_workflow(best_xgb)
+  finalize_workflow(best_xgb_up)
 
 # fit final RF model
 xgb_fit_final_up <- best_xgb_wf_up %>%
@@ -139,7 +144,7 @@ xgb_tune_down <- xgb_workflow_down %>%
   # set up tuning grid
   tune_grid(
     resamples = cv_splits,
-    grid = 20,
+    grid = 40,
     metrics = metrics, 
     control = control
   )
@@ -150,7 +155,9 @@ write_rds(xgb_tune_down, "03_outputs/xgb_tuned_downsampled.rds")
 xgb_tune_down <- read_rds("03_outputs/xgb_tuned_downsampled.rds")
 
 # show metrics
-collect_metrics(xgb_tune_down) 
+collect_metrics(xgb_tune_down) %>% 
+  select(-c(n, std_err, .config)) %>% 
+  pivot_wider(names_from = .metric, values_from = mean) %>% View()
 show_best(xgb_tune_down, "f_meas") 
 show_best(xgb_tune_down, "roc_auc")
 
