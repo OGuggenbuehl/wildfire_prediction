@@ -13,7 +13,6 @@ xgb_model <-
   set_engine("xgboost") %>% 
   set_mode("classification")
 
-
 # Upsampling --------------------------------------------------------------
 
 # preprocessing recipe
@@ -151,8 +150,8 @@ write_rds(xgb_tune_down, "03_outputs/xgb_tuned_downsampled.rds")
 xgb_tune_down <- read_rds("03_outputs/xgb_tuned_downsampled.rds")
 
 # show metrics
-collect_metrics(xgb_tune_down) %>% View()
-show_best(xgb_tune_down, "f_meas") %>% View()
+collect_metrics(xgb_tune_down) 
+show_best(xgb_tune_down, "f_meas") 
 show_best(xgb_tune_down, "roc_auc")
 
 # select best tuning specification

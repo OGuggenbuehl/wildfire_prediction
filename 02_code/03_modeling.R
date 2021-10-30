@@ -24,24 +24,6 @@ data <- read_rds("01_data/data_seasonal.rds") %>%
                        'FALSE' = 'none'),
          fire = fct_relevel(fire, c('fire', 'none')))
 
-# Randomized train/test split ---------------------------------------------
-# set.seed(123)
-# splits <- initial_split(data,
-#                         # set split proportion
-#                         prop = 0.7,
-#                         # stratify by highly imbalanced response
-#                         strata = fire)
-# 
-# # create train set
-# data_train <- training(splits)
-# # create test set
-# data_test  <- testing(splits)
-# # create validation set
-# data_valid <- validation_split(data_train, 
-#                                strata = fire, 
-#                                prop = 0.7)
-
-
 # time-based train/test split ---------------------------------------------
 n_train <- data %>% 
   mutate(train = if_else(year <= 2016, TRUE, FALSE)) %>% 
