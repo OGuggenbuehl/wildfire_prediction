@@ -58,11 +58,11 @@ collect_metrics(glm_fit_up)
 
 # summarize within-fold predictions
 glm_preds_up <- collect_predictions(glm_fit_up, 
-                                 summarize = TRUE)
+                                    summarize = TRUE)
 
 # plot ROC curve
 glm_preds_up %>% 
-  roc_curve(truth = fire, .pred_FALSE) %>% 
+  roc_curve(truth = fire, .pred_fire) %>% 
   autoplot()
 
 # confusion matrix
@@ -71,8 +71,7 @@ glm_confmat_up <- glm_preds_up %>%
 glm_confmat_up
 
 # additional metrics 
-summary(glm_confmat_up, 
-        event_level = 'second')
+summary(glm_confmat_up)
 
 # Downsampling using NearMiss 1 -------------------------------------------
 
@@ -132,7 +131,7 @@ glm_preds_down <- collect_predictions(glm_fit_down,
 
 # plot ROC curve
 glm_preds_down %>% 
-  roc_curve(truth = fire, .pred_FALSE) %>% 
+  roc_curve(truth = fire, .pred_fire) %>% 
   autoplot()
 
 # confusion matrix
@@ -141,5 +140,4 @@ glm_confmat_down <- glm_preds_down %>%
 glm_confmat_down
 
 # additional metrics 
-summary(glm_confmat_down, 
-        event_level = 'second')
+summary(glm_confmat_down)

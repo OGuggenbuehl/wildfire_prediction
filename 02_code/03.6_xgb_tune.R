@@ -13,8 +13,11 @@ xgb_model <-
   set_engine("xgboost") %>% 
   set_mode("classification")
 
+
+# Upsampling --------------------------------------------------------------
+
 # preprocessing recipe
-xgb_recipe <- recipe(fire ~ ., data = data_train) %>% 
+xgb_recipe_up <- recipe(fire ~ ., data = data_train) %>% 
   update_role(id, new_role = "ID") %>% 
   # drop highly correlated features
   step_rm(lake, river, powerline, road,
@@ -32,7 +35,7 @@ xgb_recipe <- recipe(fire ~ ., data = data_train) %>%
             threshold = .9)
 
 # bundle model and recipe to workflow
-xgb_workflow <- workflow() %>% 
+xgb_workflow_up <- workflow() %>% 
   add_model(xgb_model) %>% 
   add_recipe(xgb_recipe)
 
@@ -45,7 +48,7 @@ xgb_model %>%
 
 # tune with 5-fold CV
 start <- Sys.time()
-xgb_tune <- xgb_workflow %>% 
+xgb_tune_up <- xgb_workflow_up %>% 
   # set up tuning grid
   tune_grid(
     resamples = cv_splits,
@@ -56,37 +59,125 @@ xgb_tune <- xgb_workflow %>%
 end <- Sys.time()
 end-start
 
-write_rds(xgb_tune, "03_outputs/xgb_tuned.rds")
-xgb_tune <- read_rds("03_outputs/xgb_tuned.rds")
+write_rds(xgb_tune_up, "03_outputs/xgb_tuned_upsampled.rds")
+xgb_tune_up <- read_rds("03_outputs/xgb_tuned_upsampled.rds")
 
 # show metrics
-collect_metrics(xgb_tune)
-show_best(xgb_tune, "f_meas")
-show_best(xgb_tune, "roc_auc")
-
-# manually create tuning grid based on these results
-xgb_grid <- grid_regular(mtry(range = c(2, 10)),
-                        min_n(range = c(4, 16)), 
-                        levels = 5)
+collect_metrics(xgb_tune_up) 
+show_best(xgb_tune_up, "f_meas")
+show_best(xgb_tune_up, "roc_auc")
 
 # select best tuning specification
-best_rf <- select_best(xgb_tune_manual, "f_meas")
+best_xgb_up <- select_best(xgb_tune_up, "f_meas")
 
 # finalize workflow with best tuning parameters
-best_xgb_wf <- xgb_workflow %>% 
-  finalize_workflow(best_rf)
+best_xgb_wf_up <- xgb_workflow_up %>% 
+  finalize_workflow(best_xgb)
 
 # fit final RF model
-xgb_fit_final <- best_xgb_wf %>%
+xgb_fit_final_up <- best_xgb_wf_up %>%
   last_fit(split = t_split, 
            metrics = metrics)
-
 # metrics
-xgb_fit_final %>%
+xgb_fit_final_up %>%
   collect_metrics()
 
 # ROC curve
-xgb_fit_final %>%
+xgb_fit_final_up %>%
   collect_predictions() %>% 
-  roc_curve(fire, .pred_FALSE) %>% 
+  roc_curve(fire, .pred_fire) %>% 
   autoplot()
+
+# confusion matrix
+xgb_confmat_up <- xgb_fit_final_up %>%
+  collect_predictions() %>% 
+  conf_mat(truth = fire, estimate = .pred_class)
+xgb_confmat_up
+
+# Downsampling ------------------------------------------------------------
+
+# preprocessing recipe
+xgb_recipe_down <- recipe(fire ~ ., data = data_train) %>% 
+  update_role(id, new_role = "ID") %>% 
+  # drop highly correlated features
+  step_rm(lake, river, powerline, road,
+          recreational_routes, starts_with('perc_yes')) %>% 
+  # remove 0-variance features
+  step_zv(all_predictors()) %>% 
+  # remove highly-correlated features
+  step_corr(all_numeric_predictors(),
+            threshold = .9) %>% 
+  # remove ID for train set due to bugged step_nearmiss and step_tomek
+  step_rm(id, skip = TRUE) %>% 
+  # create dummies for categorical features
+  step_dummy(all_nominal_predictors()) %>% 
+  # downsampling with NearMiss 1
+  step_nearmiss(fire,
+                # majority to minority class ratio
+                under_ratio = 2,
+                # skip for test set
+                skip = TRUE) %>% 
+  # remove TOMEK-links for better class boundaries
+  step_tomek(fire, 
+             # skip for test set
+             skip = TRUE)
+
+# bundle model and recipe to workflow
+xgb_workflow_down <- workflow() %>% 
+  add_model(xgb_model) %>% 
+  add_recipe(xgb_recipe_down)
+
+# register parallel-processing backend
+registerDoParallel(cl)
+
+# inspect model and tuning parameters
+xgb_model %>%    
+  parameters() 
+
+# tune with 5-fold CV
+start <- Sys.time()
+xgb_tune_down <- xgb_workflow_down %>% 
+  # set up tuning grid
+  tune_grid(
+    resamples = cv_splits,
+    grid = 20,
+    metrics = metrics, 
+    control = control
+  )
+end <- Sys.time()
+end-start
+
+write_rds(xgb_tune_down, "03_outputs/xgb_tuned_downsampled.rds")
+xgb_tune_down <- read_rds("03_outputs/xgb_tuned_downsampled.rds")
+
+# show metrics
+collect_metrics(xgb_tune_down) %>% View()
+show_best(xgb_tune_down, "f_meas") %>% View()
+show_best(xgb_tune_down, "roc_auc")
+
+# select best tuning specification
+best_xgb_down <- select_best(xgb_tune_down, "f_meas")
+
+# finalize workflow with best tuning parameters
+best_xgb_wf_down <- xgb_workflow_down %>% 
+  finalize_workflow(best_xgb_down)
+
+# fit final model
+xgb_fit_final_down <- best_xgb_wf_down %>%
+  last_fit(split = t_split, 
+           metrics = metrics)
+# metrics
+xgb_fit_final_down %>%
+  collect_metrics()
+
+# ROC curve
+xgb_fit_final_down %>%
+  collect_predictions() %>% 
+  roc_curve(fire, .pred_fire) %>% 
+  autoplot()
+
+# confusion matrix
+xgb_confmat_down <- xgb_fit_final_down %>%
+  collect_predictions() %>% 
+  conf_mat(truth = fire, estimate = .pred_class)
+xgb_confmat_down

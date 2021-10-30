@@ -56,7 +56,7 @@ elanet_tune <- elanet_wf %>%
 end <- Sys.time()
 end-start
 
-# write_rds(elanet_tune, "03_outputs/elanet_tune.rds")
+write_rds(elanet_tune, "03_outputs/elanet_tune_upsampled.rds")
 elanet_tune <- read_rds("03_outputs/elanet_tune_upsampled.rds")
 
 # show metrics
@@ -65,7 +65,7 @@ show_best(elanet_tune, "f_meas")
 show_best(elanet_tune, "roc_auc")
 
 # select best tuning specification
-best_elanet <- select_best(elanet_tune, "f_meas")
+best_elanet <- select_best(elanet_tune, "roc_auc")
 
 # finalize workflow with best tuning parameters
 final_elanet_wf <- elanet_wf %>% 
@@ -83,7 +83,7 @@ final_elanet_fit %>%
 # ROC curve
 final_elanet_fit %>%
   collect_predictions() %>% 
-  roc_curve(fire, .pred_FALSE) %>% 
+  roc_curve(fire, .pred_fire) %>% 
   autoplot()
 
 # ROC curve

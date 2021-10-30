@@ -60,8 +60,8 @@ rf_tune <- rf_workflow %>%
 end <- Sys.time()
 end-start
 
-# write_rds(rf_tune, "03_outputs/rf_tuned.rds")
-rf_tune <- read_rds("03_outputs/rf_tuned.rds")
+write_rds(rf_tune, "03_outputs/RF_tuned_downsampled.rds")
+rf_tune <- read_rds("03_outputs/RF_tuned_downsampled.rds")
 
 # show metrics
 collect_metrics(rf_tune)
@@ -74,13 +74,18 @@ rf_grid <- grid_regular(mtry(range = c(12, 36)),
                         min_n(range = c(3, 15)), 
                         levels = 5)
 
-rf_tune_manual <- rf_workflow %>% 
+rf_tune_manual_downsampled <- rf_workflow %>% 
   tune_grid(
   resamples = cv_splits,
   grid = rf_grid,
   metrics = metrics, 
   control = control
 )
+
+# write to disk
+write_rds(rf_tune_manual_downsampled, "03_outputs/RF_tune_manual_downsampled.rds")
+# read from disk
+rf_tune_manual_downsampled <- read_rds("03_outputs/RF_tune_manual_downsampled.rds")
 
 # show metrics
 collect_metrics(rf_tune_manual)
@@ -107,5 +112,5 @@ rf_fit_final %>%
 # ROC curve
 rf_fit_final %>%
   collect_predictions() %>% 
-  roc_curve(fire, .pred_FALSE) %>% 
+  roc_curve(fire, .pred_fire) %>% 
   autoplot()

@@ -49,8 +49,8 @@ rf_res <- rf_workflow %>%
 end <- Sys.time()
 end-start
 
-# write_rds(rf_res, "03_outputs/RF_res.rds")
-rf_res <- read_rds("03_outputs/RF_res.rds")
+write_rds(rf_res, "03_outputs/RF_res_downsampled.rds")
+rf_res <- read_rds("03_outputs/RF_res_downsampled.rds")
 
 # metrics of resampled fit
 collect_metrics(rf_res)
