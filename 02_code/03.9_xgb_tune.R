@@ -13,7 +13,8 @@ xgb_model <-
   set_engine("xgboost") %>% 
   set_mode("classification")
 
-# Upsampling --------------------------------------------------------------
+
+# Upsampling with SMOTE ---------------------------------------------------
 
 # preprocessing recipe
 xgb_recipe_up <- recipe(fire ~ ., data = data_train) %>% 
@@ -98,7 +99,7 @@ xgb_confmat_up <- xgb_fit_final_up %>%
   conf_mat(truth = fire, estimate = .pred_class)
 xgb_confmat_up
 
-# Downsampling ------------------------------------------------------------
+# Downsampling with NearMiss 1 --------------------------------------------
 
 # preprocessing recipe
 xgb_recipe_down <- recipe(fire ~ ., data = data_train) %>% 
