@@ -162,7 +162,7 @@ show_best(xgb_tune_down, "f_meas")
 show_best(xgb_tune_down, "roc_auc")
 
 # select best tuning specification
-best_xgb_down <- select_best(xgb_tune_down, "f_meas")
+best_xgb_down <- select_best(xgb_tune_down, "recall")
 
 # finalize workflow with best tuning parameters
 best_xgb_wf_down <- xgb_workflow_down %>% 

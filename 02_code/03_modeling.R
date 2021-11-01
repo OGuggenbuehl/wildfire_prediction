@@ -15,9 +15,9 @@ data <- read_rds("01_data/data_seasonal.rds") %>%
   select(-c(perc_republicans,
             county_persons_per_household,
             temp_min_avg,
-            temp_max_avg,
-            county_unemployment, 
-            county_unemployment_rate)) %>% 
+            temp_max_avg, 
+            county_unemployment_rate,
+            county_unemployment)) %>% 
   mutate_if(is.logical, as.numeric) %>% 
   mutate(fire = recode(fire, 
                        'TRUE' = 'fire', 
@@ -45,37 +45,11 @@ set.seed(123)
 cv_splits <- vfold_cv(data_train, 
                       v = 5)
 
-# custom metric penalizing false negatives
-classification_cost_penalized <- function(
-  data,
-  truth,
-  class_prob,
-  na_rm = TRUE
-) {
-  
-  # cost matrix penalizing false negatives
-  cost_matrix <- tribble(
-    ~truth, ~estimate, ~cost,
-    "fire", "none",  2,
-    "none", "fire",  1
-  )
-  
-  classification_cost(
-    data = data,
-    truth = !! rlang::enquo(truth),
-    # supply the function with the class probabilities
-    !! rlang::enquo(class_prob), 
-    # supply the function with the cost matrix
-    costs = cost_matrix,
-    na_rm = na_rm
-  )
-}
-
-# formalize new metric
-classification_cost_penalized <- new_prob_metric(classification_cost_penalized, "minimize")
+# source("02_code/custom_cost_matrix.R")
 
 # specify metrics
-metrics <- metric_set(classification_cost_penalized, f_meas, 
+metrics <- metric_set(#classification_cost_penalized, 
+                      f_meas, 
                       precision, recall,
                       sensitivity, specificity,
                       accuracy, roc_auc)

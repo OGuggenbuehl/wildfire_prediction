@@ -11,7 +11,7 @@ xgb_model <- boost_tree() %>%
 xgb_recipe_up <- recipe(fire ~ ., data = data_train) %>% 
   update_role(id, new_role = "ID") %>% 
   # drop highly correlated features
-  step_rm(lake, river, powerline, road,
+  step_rm(lake, river, powerline, road, year, 
           recreational_routes, starts_with('perc_yes')) %>% 
   # create dummies
   step_dummy(all_nominal_predictors()) %>% 

@@ -86,7 +86,7 @@ final_elanet_fit %>%
   roc_curve(fire, .pred_fire) %>% 
   autoplot()
 
-# ROC curve
+# Confusion Matrix
 final_elanet_fit %>%
   collect_predictions() %>% 
   conf_mat(truth = fire, estimate = .pred_class)

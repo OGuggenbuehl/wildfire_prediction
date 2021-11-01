@@ -37,9 +37,6 @@ glm_workflow_up <- workflow() %>%
   add_model(glm_model) %>% 
   add_recipe(glm_recipe_up)
 
-# register parallel-processing backend
-registerDoParallel(cl)
-
 # fit model
 start <- Sys.time()
 glm_fit_up <- glm_workflow_up %>% 
