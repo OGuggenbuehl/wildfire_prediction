@@ -14,8 +14,6 @@ xgb_model <-
              scale_pos_weight = param$scale_pos_weight) %>% 
   set_mode("classification")
 
-# Upsampling --------------------------------------------------------------
-
 # preprocessing recipe
 xgb_recipe <- recipe(fire ~ ., data = data_train) %>% 
   update_role(id, new_role = "ID") %>% 
