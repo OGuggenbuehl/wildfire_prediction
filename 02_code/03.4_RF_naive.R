@@ -24,7 +24,7 @@ rf_workflow <- workflow() %>%
   add_model(rf_model) %>% 
   add_recipe(rf_recipe)
 
-# tune with 5-fold CV
+# fit naive model
 start <- Sys.time()
 rf_fit <- rf_workflow %>% 
   # set up tuning grid
