@@ -47,7 +47,9 @@ glm_fit_up <- glm_workflow_up %>%
 end <- Sys.time()
 end-start
 
+# write to disk
 write_rds(glm_fit_up, "03_outputs/glm_fit_upsampled.rds")
+# read from disk
 glm_fit_up <- read_rds("03_outputs/glm_fit_upsampled.rds")
 
 # metrics of resampled fit

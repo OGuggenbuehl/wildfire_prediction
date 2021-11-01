@@ -31,9 +31,9 @@ end <- Sys.time()
 end-start
 
 # write to disk
-# write_rds(glm_fit, "03_outputs/glm_naive.rds")
+write_rds(glm_fit, "03_outputs/glm_naive.rds")
 # read from disk
-# glm_fit <- read_rds("03_outputs/glm_naive.rds")
+glm_fit <- read_rds("03_outputs/glm_naive.rds")
 
 # plot ROC curve
 predict(glm_fit, type = 'prob',
