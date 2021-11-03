@@ -45,12 +45,11 @@ set.seed(123)
 cv_splits <- vfold_cv(data_train, 
                       v = 5)
 
-# source("02_code/custom_cost_matrix.R")
+source("02_code/custom_cost_matrix.R")
 
 # specify metrics
-metrics <- metric_set(#classification_cost_penalized, 
-                      f_meas, 
-                      precision, recall,
+metrics <- metric_set(classification_cost_penalized,
+                      f_meas, precision, recall,
                       sensitivity, specificity,
                       accuracy, roc_auc)
 # fit control
