@@ -577,7 +577,8 @@ data %<>%
                     "4207", "6186", "6370", "6393", "6416"))
 
 # write monthly tibble to disk
-write_rds(data, "01_data/data_monthly.rds")
+# write_rds(data, "01_data/data_monthly.rds")
+data <- read_rds("01_data/data_monthly.rds")
 
 # aggregate to seasonal ---------------------------------------------------
 
