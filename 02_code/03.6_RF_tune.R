@@ -41,7 +41,8 @@ rf_workflow_up <- workflow() %>%
   add_recipe(rf_recipe_up)
 
 # register parallel-processing backend
-registerDoParallel(cl)
+cl <- makeCluster(all_cores)
+plan(cluster, workers = cl)
 
 # tune with 5-fold CV
 start <- Sys.time()
@@ -55,6 +56,9 @@ rf_tune_up <- rf_workflow_up %>%
   )
 end <- Sys.time()
 end-start
+
+# shut down workers
+stopCluster(cl = cl)
 
 write_rds(rf_tune_up, "03_outputs/RF_tuned_downsampled.rds")
 rf_tune_up <- read_rds("03_outputs/RF_tuned_downsampled.rds")
@@ -120,7 +124,8 @@ rf_workflow_down <- workflow() %>%
   add_recipe(rf_recipe_down)
 
 # register parallel-processing backend
-registerDoParallel(cl)
+cl <- makeCluster(all_cores)
+plan(cluster, workers = cl)
 
 # tune with 5-fold CV
 start <- Sys.time()
@@ -134,6 +139,9 @@ rf_tune_down <- rf_workflow_down %>%
   )
 end <- Sys.time()
 end-start
+
+# shut down workers
+stopCluster(cl = cl)
 
 write_rds(rf_tune_down, "03_outputs/RF_tuned_downsampled.rds")
 rf_tune_down <- read_rds("03_outputs/RF_tuned_downsampled.rds")

@@ -40,11 +40,8 @@ xgb_workflow_up <- workflow() %>%
   add_recipe(xgb_recipe_up)
 
 # register parallel-processing backend
-registerDoParallel(cl)
-
-# inspect model and tuning parameters
-xgb_model %>%    
-  parameters() 
+cl <- makeCluster(all_cores)
+plan(cluster, workers = cl)
 
 # tune with 5-fold CV
 start <- Sys.time()
@@ -58,6 +55,9 @@ xgb_tune_up <- xgb_workflow_up %>%
   )
 end <- Sys.time()
 end-start
+
+# shut down workers
+stopCluster(cl = cl)
 
 write_rds(xgb_tune_up, "03_outputs/xgb_tuned_upsampled.rds")
 xgb_tune_up <- read_rds("03_outputs/xgb_tuned_upsampled.rds")
@@ -133,11 +133,8 @@ xgb_workflow_down <- workflow() %>%
   add_recipe(xgb_recipe_down)
 
 # register parallel-processing backend
-registerDoParallel(cl)
-
-# inspect model and tuning parameters
-xgb_model %>%    
-  parameters() 
+cl <- makeCluster(all_cores)
+plan(cluster, workers = cl)
 
 # tune with 5-fold CV
 start <- Sys.time()
@@ -151,6 +148,9 @@ xgb_tune_down <- xgb_workflow_down %>%
   )
 end <- Sys.time()
 end-start
+
+# shut down workers
+stopCluster(cl = cl)
 
 write_rds(xgb_tune_down, "03_outputs/xgb_tuned_downsampled.rds")
 xgb_tune_down <- read_rds("03_outputs/xgb_tuned_downsampled.rds")

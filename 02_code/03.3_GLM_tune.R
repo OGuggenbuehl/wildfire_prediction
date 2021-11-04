@@ -44,15 +44,16 @@ elanet_wf_up <- workflow() %>%
   add_model(elanet_model) %>% 
   add_recipe(elanet_recipe_up)
 
-# register parallel-processing backend
-registerDoParallel(cl)
-
 # set up tuning grid
 elanet_grid <- grid_regular(penalty(),
                             mixture(),
                             levels = 5)
 
-# tune with 5-fold CV
+# register parallel-processing backend
+cl <- makeCluster(all_cores)
+plan(cluster, workers = cl)
+
+# resample with 5-fold CV
 start <- Sys.time()
 elanet_tune_up <- elanet_wf_up %>% 
   tune_grid(
@@ -63,6 +64,9 @@ elanet_tune_up <- elanet_wf_up %>%
     )
 end <- Sys.time()
 end-start
+
+# shut down workers
+stopCluster(cl = cl)
 
 # write to disk
 write_rds(elanet_tune_up, "03_outputs/elanet_tune_upsampled.rds")
@@ -137,15 +141,16 @@ elanet_wf_down <- workflow() %>%
   add_model(elanet_model) %>% 
   add_recipe(elanet_recipe_down)
 
-# register parallel-processing backend
-registerDoParallel(cl)
-
 # set up tuning grid
 elanet_grid <- grid_regular(penalty(),
                             mixture(),
                             levels = 5)
 
-# tune with 10-fold CV
+# register parallel-processing backend
+cl <- makeCluster(all_cores)
+plan(cluster, workers = cl)
+
+# resample with 5-fold CV
 start <- Sys.time()
 elanet_tune_down <- elanet_wf_down %>% 
   tune_grid(
@@ -156,6 +161,9 @@ elanet_tune_down <- elanet_wf_down %>%
   )
 end <- Sys.time()
 end-start
+
+# shut down workers
+stopCluster(cl = cl)
 
 # write to disk
 write_rds(elanet_tune_down, "03_outputs/elanet_tune_upsampled.rds")

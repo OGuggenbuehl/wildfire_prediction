@@ -3,7 +3,8 @@ library(tidymodels)
 # require("devtools")
 # install_github("tidymodels/themis")
 library(themis)
-library(doParallel)
+library(parallel)
+library(doFuture)
 options(tidymodels.dark = TRUE)
 
 # load data ---------------------------------------------------------------
@@ -62,7 +63,7 @@ control <- control_resamples(
 
 # set up parallel-processing backend
 all_cores <- parallel::detectCores(logical = FALSE)
-cl <- makePSOCKcluster(all_cores)
+registerDoFuture()
 
 # GLM ---------------------------------------------------------------------
 # upsampled & resampled

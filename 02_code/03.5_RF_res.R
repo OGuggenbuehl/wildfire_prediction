@@ -37,7 +37,8 @@ rf_workflow_up <- workflow() %>%
   add_recipe(rf_recipe_up)
 
 # register parallel-processing backend
-registerDoParallel(cl)
+cl <- makeCluster(all_cores)
+plan(cluster, workers = cl)
 
 # fit model
 start <- Sys.time()
@@ -48,6 +49,9 @@ rf_res_up <- rf_workflow_up %>%
   )
 end <- Sys.time()
 end-start
+
+# shut down workers
+stopCluster(cl = cl)
 
 write_rds(rf_res_up, "03_outputs/RF_res_downsampled.rds")
 rf_res_up <- read_rds("03_outputs/RF_res_downsampled.rds")
@@ -103,7 +107,8 @@ rf_workflow_down <- workflow() %>%
   add_recipe(rf_recipe_down)
 
 # register parallel-processing backend
-registerDoParallel(cl)
+cl <- makeCluster(all_cores)
+plan(cluster, workers = cl)
 
 # fit model
 start <- Sys.time()
@@ -114,6 +119,9 @@ rf_res_down <- rf_workflow_down %>%
   )
 end <- Sys.time()
 end-start
+
+# shut down workers
+stopCluster(cl = cl)
 
 write_rds(rf_res_down, "03_outputs/RF_res_downsampled.rds")
 rf_res_down <- read_rds("03_outputs/RF_res_downsampled.rds")

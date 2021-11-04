@@ -33,7 +33,13 @@ end-start
 # write to disk
 write_rds(glm_fit, "03_outputs/glm_naive.rds")
 # read from disk
-glm_fit <- read_rds("03_outputs/glm_naive.rds")
+# glm_fit <- read_rds("03_outputs/glm_naive.rds")
+
+glm_naive_preds <- predict(glm_fit, type = 'prob',
+                           new_data = data_test) %>% 
+  bind_cols(data_test)
+
+classification_cost_penalized(glm_naive_preds, .pred_fire, truth = fire)
 
 # plot ROC curve
 predict(glm_fit, type = 'prob',
