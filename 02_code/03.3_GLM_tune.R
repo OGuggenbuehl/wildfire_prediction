@@ -15,7 +15,7 @@ elanet_recipe_up <-  recipe(fire ~ ., data = data_train) %>%
   # remove id from predictors
   update_role(id, new_role = "ID") %>% 
   # drop highly correlated features
-  step_rm(lake, river, powerline, road,
+  step_rm(lake, river, powerline, road, DPA_agency, 
           recreational_routes, starts_with('perc_yes')) %>%
   # power transformation for skewed distance features
   step_sqrt(starts_with('dist_')) %>% 
@@ -112,7 +112,7 @@ elanet_recipe_down <- recipe(fire ~ ., data = data_train) %>%
   # remove id from predictors
   update_role(id, new_role = "ID") %>% 
   # drop highly correlated features
-  step_rm(lake, river, powerline, road,
+  step_rm(lake, river, powerline, road, DPA_agency, 
           recreational_routes, starts_with('perc_yes')) %>%
   # power transformation for skewed distance features
   step_sqrt(starts_with('dist_')) %>% 

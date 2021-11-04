@@ -8,7 +8,7 @@ glm_recipe <-  recipe(fire ~ ., data = data_train) %>%
   # remove id from predictors
   update_role(id, new_role = "ID") %>% 
   # drop highly correlated features
-  step_rm(lake, river, powerline, road, 
+  step_rm(lake, river, powerline, road, DPA_agency,
           recreational_routes, starts_with('perc_yes')) %>%
   # power transformation for skewed distance features
   step_sqrt(starts_with('dist_')) %>% 
@@ -39,18 +39,14 @@ glm_naive_preds <- predict(glm_fit, type = 'prob',
                            new_data = data_test) %>% 
   bind_cols(data_test)
 
-classification_cost_penalized(glm_naive_preds, .pred_fire, truth = fire)
-
 # plot ROC curve
-predict(glm_fit, type = 'prob',
-        new_data = data_test) %>% 
-  bind_cols(data_test) %>% 
+glm_naive_preds %>% 
   roc_curve(truth = fire, .pred_fire) %>% 
   autoplot()
 
 # confusion matrix
 glm_confmat <- predict(glm_fit, type = 'class',
-        new_data = data_test) %>% 
+                       new_data = data_test) %>% 
   bind_cols(data_test) %>% 
   conf_mat(truth = fire, 
            estimate = .pred_class)

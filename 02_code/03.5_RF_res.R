@@ -11,7 +11,7 @@ rf_model <- rand_forest() %>%
 rf_recipe_up <- recipe(fire ~ ., data = data_train) %>% 
   update_role(id, new_role = "ID") %>% 
   # drop highly correlated features
-  step_rm(lake, river, powerline, road,
+  step_rm(lake, river, powerline, road, DPA_agency, 
           recreational_routes, starts_with('perc_yes')) %>% 
   # remove 0-variance features
   step_zv(all_predictors()) %>% 
@@ -79,7 +79,7 @@ rf_confmat_up
 rf_recipe_down <- recipe(fire ~ ., data = data_train) %>% 
   update_role(id, new_role = "ID") %>% 
   # drop highly correlated features
-  step_rm(lake, river, powerline, road,
+  step_rm(lake, river, powerline, road, DPA_agency, 
           recreational_routes, starts_with('perc_yes')) %>% 
   # remove 0-variance features
   step_zv(all_predictors()) %>% 
