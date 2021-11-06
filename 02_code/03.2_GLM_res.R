@@ -10,7 +10,7 @@ glm_recipe_up <-  recipe(fire ~ ., data = data_train) %>%
   # remove id from predictors
   update_role(id, new_role = "ID") %>% 
   # drop highly correlated features
-  step_rm(lake, river, powerline, road, DPA_agency, 
+  step_rm(lake, river, powerline, road, 
           recreational_routes, starts_with('perc_yes')) %>%
   # power transformation for skewed distance features
   step_sqrt(starts_with('dist_')) %>% 
@@ -43,7 +43,7 @@ plan(cluster, workers = cl)
 
 # fit model
 start <- Sys.time()
-glm_fit_up <- glm_workflow_up %>% 
+glm_res_up <- glm_workflow_up %>% 
   fit_resamples(resamples = cv_splits, 
                 metrics = metrics, 
                 control = control
@@ -55,15 +55,15 @@ end-start
 stopCluster(cl = cl)
 
 # write to disk
-write_rds(glm_fit_up, "03_outputs/glm_res_upsampled.rds")
+write_rds(glm_res_up, "03_outputs/GLM_res_upsampled.rds")
 # read from disk
-# glm_fit_up <- read_rds("03_outputs/glm_res_upsampled.rds")
+# glm_res_up <- read_rds("03_outputs/GLM_res_upsampled.rds")
 
 # metrics of resampled fit
-collect_metrics(glm_fit_up)
+collect_metrics(glm_res_up)
 
 # summarize within-fold predictions
-glm_preds_up <- collect_predictions(glm_fit_up, 
+glm_preds_up <- collect_predictions(glm_res_up, 
                                     summarize = TRUE)
 
 # plot ROC curve
@@ -85,7 +85,7 @@ summary(glm_confmat_up)
 glm_recipe_down <- recipe(fire ~ ., data = data_train) %>%
   update_role(id, new_role = "ID") %>%
   # drop highly correlated features
-  step_rm(lake, river, powerline, road, DPA_agency, 
+  step_rm(lake, river, powerline, road, 
           recreational_routes, starts_with('perc_yes')) %>%
   # remove 0-variance features
   step_zv(all_predictors()) %>%
@@ -113,12 +113,12 @@ glm_workflow_down <- workflow() %>%
   add_recipe(glm_recipe_down)
 
 # register parallel-processing backend
-cl <- makeCluster(all_cores)
+cl <- makeCluster(allCores)
 plan(cluster, workers = cl)
 
 # fit model
 start <- Sys.time()
-glm_fit_down <- glm_workflow_down %>% 
+glm_res_down <- glm_workflow_down %>% 
   fit_resamples(resamples = cv_splits, 
                 metrics = metrics, 
                 control = control
@@ -129,15 +129,15 @@ end-start
 # shut down workers
 stopCluster(cl = cl)
 
-write_rds(glm_fit_down, "03_outputs/glm_res_downsampled.rds")
-# glm_fit_down <- read_rds("03_outputs/glm_res_downsampled.rds")
+write_rds(glm_res_down, "03_outputs/GLM_res_downsampled.rds")
+# glm_res_down <- read_rds("03_outputs/GLM_res_downsampled.rds")
 
 # metrics of resampled fit
-collect_metrics(glm_fit_down)
+collect_metrics(glm_res_down)
 
 # summarize within-fold predictions
-glm_preds_down <- collect_predictions(glm_fit_down, 
-                                 summarize = TRUE)
+glm_preds_down <- collect_predictions(glm_res_down, 
+                                      summarize = TRUE)
 
 # plot ROC curve
 glm_preds_down %>% 

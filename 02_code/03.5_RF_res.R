@@ -11,7 +11,7 @@ rf_model <- rand_forest() %>%
 rf_recipe_up <- recipe(fire ~ ., data = data_train) %>% 
   update_role(id, new_role = "ID") %>% 
   # drop highly correlated features
-  step_rm(lake, river, powerline, road, DPA_agency, 
+  step_rm(lake, river, powerline, road,
           recreational_routes, starts_with('perc_yes')) %>% 
   # remove 0-variance features
   step_zv(all_predictors()) %>% 
@@ -53,8 +53,10 @@ end-start
 # shut down workers
 stopCluster(cl = cl)
 
+# write to disk
 write_rds(rf_res_up, "03_outputs/RF_res_downsampled.rds")
-rf_res_up <- read_rds("03_outputs/RF_res_downsampled.rds")
+# read from disk
+# rf_res_up <- read_rds("03_outputs/RF_res_downsampled.rds")
 
 # metrics of resampled fit
 collect_metrics(rf_res_up)
@@ -79,7 +81,7 @@ rf_confmat_up
 rf_recipe_down <- recipe(fire ~ ., data = data_train) %>% 
   update_role(id, new_role = "ID") %>% 
   # drop highly correlated features
-  step_rm(lake, river, powerline, road, DPA_agency, 
+  step_rm(lake, river, powerline, road, 
           recreational_routes, starts_with('perc_yes')) %>% 
   # remove 0-variance features
   step_zv(all_predictors()) %>% 
@@ -123,8 +125,10 @@ end-start
 # shut down workers
 stopCluster(cl = cl)
 
+# write to disk
 write_rds(rf_res_down, "03_outputs/RF_res_downsampled.rds")
-rf_res_down <- read_rds("03_outputs/RF_res_downsampled.rds")
+# read from disk
+# rf_res_down <- read_rds("03_outputs/RF_res_downsampled.rds")
 
 # metrics of resampled fit
 collect_metrics(rf_res_down)

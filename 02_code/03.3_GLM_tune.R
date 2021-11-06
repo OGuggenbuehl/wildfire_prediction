@@ -15,7 +15,7 @@ elanet_recipe_up <-  recipe(fire ~ ., data = data_train) %>%
   # remove id from predictors
   update_role(id, new_role = "ID") %>% 
   # drop highly correlated features
-  step_rm(lake, river, powerline, road, DPA_agency, 
+  step_rm(lake, river, powerline, road,
           recreational_routes, starts_with('perc_yes')) %>%
   # power transformation for skewed distance features
   step_sqrt(starts_with('dist_')) %>% 
@@ -69,9 +69,9 @@ end-start
 stopCluster(cl = cl)
 
 # write to disk
-write_rds(elanet_tune_up, "03_outputs/elanet_tune_upsampled.rds")
+write_rds(elanet_tune_up, "03_outputs/GLM_tune_upsampled.rds")
 # read from disk
-elanet_tune_up <- read_rds("03_outputs/elanet_tune_upsampled.rds")
+# elanet_tune_up <- read_rds("03_outputs/GLM_tune_upsampled.rds")
 
 # show metrics
 collect_metrics(elanet_tune_up)
@@ -112,7 +112,7 @@ elanet_recipe_down <- recipe(fire ~ ., data = data_train) %>%
   # remove id from predictors
   update_role(id, new_role = "ID") %>% 
   # drop highly correlated features
-  step_rm(lake, river, powerline, road, DPA_agency, 
+  step_rm(lake, river, powerline, road,
           recreational_routes, starts_with('perc_yes')) %>%
   # power transformation for skewed distance features
   step_sqrt(starts_with('dist_')) %>% 
@@ -166,9 +166,9 @@ end-start
 stopCluster(cl = cl)
 
 # write to disk
-write_rds(elanet_tune_down, "03_outputs/elanet_tune_upsampled.rds")
+write_rds(elanet_tune_down, "03_outputs/GLM_tune_upsampled.rds")
 # read from disk
-elanet_tune_down <- read_rds("03_outputs/elanet_tune_upsampled.rds")
+# elanet_tune_down <- read_rds("03_outputs/GLM_tune_upsampled.rds")
 
 # show metrics
 collect_metrics(elanet_tune_down)

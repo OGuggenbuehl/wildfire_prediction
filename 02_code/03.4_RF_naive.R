@@ -11,7 +11,7 @@ rf_model <-
 rf_recipe <- recipe(fire ~ ., data = data_train) %>% 
   update_role(id, new_role = "ID") %>% 
   # drop highly correlated features
-  step_rm(lake, river, powerline, road, DPA_agency, 
+  step_rm(lake, river, powerline, road, 
           recreational_routes, starts_with('perc_yes')) %>% 
   # remove 0-variance features
   step_zv(all_predictors()) %>% 

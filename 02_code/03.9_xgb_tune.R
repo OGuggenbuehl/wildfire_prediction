@@ -20,7 +20,7 @@ xgb_model <-
 xgb_recipe_up <- recipe(fire ~ ., data = data_train) %>% 
   update_role(id, new_role = "ID") %>% 
   # drop highly correlated features
-  step_rm(lake, river, powerline, road, DPA_agency, 
+  step_rm(lake, river, powerline, road, 
           recreational_routes, starts_with('perc_yes')) %>% 
   # create dummies
   step_dummy(all_nominal_predictors()) %>% 
@@ -59,8 +59,8 @@ end-start
 # shut down workers
 stopCluster(cl = cl)
 
-write_rds(xgb_tune_up, "03_outputs/xgb_tuned_upsampled.rds")
-xgb_tune_up <- read_rds("03_outputs/xgb_tuned_upsampled.rds")
+write_rds(xgb_tune_up, "03_outputs/XGB_tuned_upsampled.rds")
+xgb_tune_up <- read_rds("03_outputs/XGB_tuned_upsampled.rds")
 
 # show metrics
 collect_metrics(xgb_tune_up) %>% 
@@ -105,7 +105,7 @@ xgb_confmat_up
 xgb_recipe_down <- recipe(fire ~ ., data = data_train) %>% 
   update_role(id, new_role = "ID") %>% 
   # drop highly correlated features
-  step_rm(lake, river, powerline, road, DPA_agency, 
+  step_rm(lake, river, powerline, road, 
           recreational_routes, starts_with('perc_yes')) %>% 
   # remove 0-variance features
   step_zv(all_predictors()) %>% 
@@ -152,8 +152,8 @@ end-start
 # shut down workers
 stopCluster(cl = cl)
 
-write_rds(xgb_tune_down, "03_outputs/xgb_tuned_downsampled.rds")
-xgb_tune_down <- read_rds("03_outputs/xgb_tuned_downsampled.rds")
+write_rds(xgb_tune_down, "03_outputs/XGB_tuned_downsampled.rds")
+xgb_tune_down <- read_rds("03_outputs/XGB_tuned_downsampled.rds")
 
 # show metrics
 collect_metrics(xgb_tune_down) %>% 

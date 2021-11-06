@@ -8,7 +8,7 @@ glm_recipe <-  recipe(fire ~ ., data = data_train) %>%
   # remove id from predictors
   update_role(id, new_role = "ID") %>% 
   # drop highly correlated features
-  step_rm(lake, river, powerline, road, DPA_agency,
+  step_rm(lake, river, powerline, road, 
           recreational_routes, starts_with('perc_yes')) %>%
   # power transformation for skewed distance features
   step_sqrt(starts_with('dist_')) %>% 
@@ -25,15 +25,15 @@ glm_workflow <- workflow() %>%
 
 # fit model
 start <- Sys.time()
-glm_fit <- glm_workflow %>% 
+glm_fit <- glm_workflow %>%
   fit(data = data_train)
 end <- Sys.time()
 end-start
 
 # write to disk
-write_rds(glm_fit, "03_outputs/glm_naive.rds")
+write_rds(glm_fit, "03_outputs/GLM_naive.rds")
 # read from disk
-# glm_fit <- read_rds("03_outputs/glm_naive.rds")
+# glm_fit <- read_rds("03_outputs/GLM_naive.rds")
 
 glm_naive_preds <- predict(glm_fit, type = 'prob',
                            new_data = data_test) %>% 

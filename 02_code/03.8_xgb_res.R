@@ -11,7 +11,7 @@ xgb_model <- boost_tree() %>%
 xgb_recipe_up <- recipe(fire ~ ., data = data_train) %>% 
   update_role(id, new_role = "ID") %>% 
   # drop highly correlated features
-  step_rm(lake, river, powerline, road, year, DPA_agency, 
+  step_rm(lake, river, powerline, road, year, 
           recreational_routes, starts_with('perc_yes')) %>% 
   # create dummies
   step_dummy(all_nominal_predictors()) %>% 
@@ -50,7 +50,7 @@ end-start
 # shut down workers
 stopCluster(cl = cl)
 
-# write_rds(xgb_res_up, "03_outputs/XGB_res_upsampled.rds")
+write_rds(xgb_res_up, "03_outputs/XGB_res_upsampled.rds")
 xgb_res_up <- read_rds("03_outputs/XGB_res_upsampled.rds")
 
 # metrics of resampled fit
@@ -76,7 +76,7 @@ xgb_confmat_up
 xgb_recipe_down <- recipe(fire ~ ., data = data_train) %>% 
   update_role(id, new_role = "ID") %>% 
   # drop highly correlated features
-  step_rm(lake, river, powerline, road, DPA_agency, 
+  step_rm(lake, river, powerline, road,
           recreational_routes, starts_with('perc_yes')) %>% 
   # remove 0-variance features
   step_zv(all_predictors()) %>% 

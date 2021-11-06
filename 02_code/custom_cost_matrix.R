@@ -9,7 +9,7 @@ cost_matrix <- tribble(
 classification_cost_penalized <- metric_tweak(
   .name = "classification_cost_penalized",
   .fn = classification_cost,
-  costs = cost_matrix
+  costs = !!cost_matrix
 )
 
 

@@ -18,7 +18,7 @@ xgb_model <-
 xgb_recipe <- recipe(fire ~ ., data = data_train) %>% 
   update_role(id, new_role = "ID") %>% 
   # drop highly correlated features
-  step_rm(lake, river, powerline, road, DPA_agency, 
+  step_rm(lake, river, powerline, road, 
           recreational_routes, starts_with('perc_yes')) %>% 
   # create dummies
   step_dummy(all_nominal_predictors()) %>%
@@ -40,8 +40,8 @@ xgb_fit <- xgb_workflow %>%
 end <- Sys.time()
 end-start
 
-write_rds(xgb_fit, "03_outputs/xgb_naive.rds")
-xgb_fit <- read_rds("03_outputs/xgb_naive.rds")
+write_rds(xgb_fit, "03_outputs/XGB_naive.rds")
+xgb_fit <- read_rds("03_outputs/XGB_naive.rds")
 
 # plot ROC curve
 predict(xgb_fit, type = 'prob',

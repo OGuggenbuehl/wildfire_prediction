@@ -14,6 +14,7 @@ data <- read_rds("01_data/data_seasonal.rds") %>%
   mutate(fire = as_factor(fire)) %>% 
   # drop features
   select(-c(perc_republicans,
+            DPA_agency,
             county_persons_per_household,
             temp_min_avg,
             temp_max_avg, 
@@ -57,13 +58,12 @@ metrics <- metric_set(classification_cost_penalized,
 control <- control_resamples(
   verbose = TRUE,
   save_pred = TRUE,
-  # event_level = "second", 
   allow_par = TRUE, 
   parallel_over = 'resamples')
 
-# set up parallel-processing backend
-all_cores <- parallel::detectCores(logical = FALSE)
+# setup up parallel-processing backend
 registerDoFuture()
+all_cores <- detectCores(logical = FALSE)
 
 # GLM ---------------------------------------------------------------------
 # upsampled & resampled
