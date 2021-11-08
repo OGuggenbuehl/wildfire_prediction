@@ -66,22 +66,28 @@ registerDoFuture()
 all_cores <- detectCores(logical = FALSE)
 
 # GLM ---------------------------------------------------------------------
-# upsampled & resampled
-source("02_code/03.1_GLM_res.R")
+# naive estimation
+source("02_code/03.1_GLM_naive.R")
+# resampled
+source("02_code/03.2_GLM_res.R")
 # tuned elastic net
-source("02_code/03.2_GLM_tune.R")
+source("02_code/03.3_GLM_tune.R")
 
 # Random Forest -----------------------------------------------------------
-# upsampled & resampled
-source("02_code/03.3_RF_res.R")
+# naive estimation
+source("02_code/03.4_RF_naive.R")
+# resampled
+source("02_code/03.5_RF_res.R")
 # tuned
-source("02_code/03.4_RF_tune.R")
+source("02_code/03.6_RF_tune.R")
 
 # XGB ---------------------------------------------------------------------
-# upsampled & resampled
-source("02_code/03.5_xgb_res.R")
+# naive
+source("02_code/03.7_XGB_naive.R")
+# resampled
+source("02_code/03.8_XGB_res.R")
 # tune
-source("02_code/03.6_xgb_tune.R")
+source("02_code/03.9_XGB_tune.R")
 
 # Stacking ----------------------------------------------------------------
-source("02_code/03.7_stacks.R")
+source("02_code/03.10_stacking.R")

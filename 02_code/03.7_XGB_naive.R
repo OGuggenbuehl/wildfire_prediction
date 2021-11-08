@@ -40,8 +40,10 @@ xgb_fit <- xgb_workflow %>%
 end <- Sys.time()
 end-start
 
+# write to disk
 write_rds(xgb_fit, "03_outputs/XGB_naive.rds")
-xgb_fit <- read_rds("03_outputs/XGB_naive.rds")
+# read from disk
+# xgb_fit <- read_rds("03_outputs/XGB_naive.rds")
 
 # plot ROC curve
 predict(xgb_fit, type = 'prob',

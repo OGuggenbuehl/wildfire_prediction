@@ -59,7 +59,9 @@ end-start
 # shut down workers
 stopCluster(cl = cl)
 
-write_rds(xgb_tune_up, "03_outputs/XGB_tuned_upsampled.rds")
+# write to disk
+# write_rds(xgb_tune_up, "03_outputs/XGB_tuned_upsampled.rds")
+# read from disk
 xgb_tune_up <- read_rds("03_outputs/XGB_tuned_upsampled.rds")
 
 # show metrics
@@ -152,7 +154,9 @@ end-start
 # shut down workers
 stopCluster(cl = cl)
 
-write_rds(xgb_tune_down, "03_outputs/XGB_tuned_downsampled.rds")
+# write to disk
+# write_rds(xgb_tune_down, "03_outputs/XGB_tuned_downsampled.rds")
+# read from disk
 xgb_tune_down <- read_rds("03_outputs/XGB_tuned_downsampled.rds")
 
 # show metrics

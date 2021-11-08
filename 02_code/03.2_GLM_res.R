@@ -55,9 +55,9 @@ end-start
 stopCluster(cl = cl)
 
 # write to disk
-write_rds(glm_res_up, "03_outputs/GLM_res_upsampled.rds")
+# write_rds(glm_res_up, "03_outputs/GLM_res_upsampled.rds")
 # read from disk
-# glm_res_up <- read_rds("03_outputs/GLM_res_upsampled.rds")
+glm_res_up <- read_rds("03_outputs/GLM_res_upsampled.rds")
 
 # metrics of resampled fit
 collect_metrics(glm_res_up)
@@ -113,7 +113,7 @@ glm_workflow_down <- workflow() %>%
   add_recipe(glm_recipe_down)
 
 # register parallel-processing backend
-cl <- makeCluster(allCores)
+cl <- makeCluster(all_cores)
 plan(cluster, workers = cl)
 
 # fit model
@@ -129,8 +129,10 @@ end-start
 # shut down workers
 stopCluster(cl = cl)
 
-write_rds(glm_res_down, "03_outputs/GLM_res_downsampled.rds")
-# glm_res_down <- read_rds("03_outputs/GLM_res_downsampled.rds")
+# write to disk
+# write_rds(glm_res_down, "03_outputs/GLM_res_downsampled.rds")
+# read from disk
+glm_res_down <- read_rds("03_outputs/GLM_res_downsampled.rds")
 
 # metrics of resampled fit
 collect_metrics(glm_res_down)

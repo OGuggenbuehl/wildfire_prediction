@@ -39,10 +39,7 @@ start <- Sys.time()
 xgb_res_up <- xgb_workflow_up %>% 
   fit_resamples(resamples = cv_splits, 
                 metrics = metrics, 
-                control = control_resamples(
-                  verbose = TRUE,
-                  save_pred = TRUE,
-                  allow_par = FALSE)
+                control = control
   )
 end <- Sys.time()
 end-start
@@ -50,7 +47,9 @@ end-start
 # shut down workers
 stopCluster(cl = cl)
 
-write_rds(xgb_res_up, "03_outputs/XGB_res_upsampled.rds")
+# write to disk
+# write_rds(xgb_res_up, "03_outputs/XGB_res_upsampled.rds")
+# read from disk
 xgb_res_up <- read_rds("03_outputs/XGB_res_upsampled.rds")
 
 # metrics of resampled fit
@@ -120,7 +119,9 @@ end-start
 # shut down workers
 stopCluster(cl = cl)
 
-write_rds(xgb_res_down, "03_outputs/XGB_res_downsampled.rds")
+# write to disk
+# write_rds(xgb_res_down, "03_outputs/XGB_res_downsampled.rds")
+# read from disk
 xgb_res_down <- read_rds("03_outputs/XGB_res_downsampled.rds")
 
 # metrics of resampled fit
