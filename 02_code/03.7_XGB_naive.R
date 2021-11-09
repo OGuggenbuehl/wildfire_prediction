@@ -26,7 +26,7 @@ xgb_recipe <- recipe(fire ~ ., data = data_train) %>%
   step_zv(all_predictors()) %>%
   # remove highly-correlated features
   step_corr(all_numeric_predictors(),
-            threshold = .9)
+            threshold = .75)
 
 # bundle model and recipe to workflow
 xgb_workflow <- workflow() %>% 

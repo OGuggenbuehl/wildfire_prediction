@@ -18,7 +18,7 @@ glm_recipe_up <-  recipe(fire ~ ., data = data_train) %>%
   step_zv(all_predictors()) %>%
   # remove highly-correlated features
   step_corr(all_numeric_predictors(),
-            threshold = .9) %>% 
+            threshold = .75) %>% 
   # remove ID for train set due to bugged step_nearmiss and step_tomek
   step_rm(id, skip = TRUE) %>%
   # turn all categorical features into dummy variables
@@ -55,9 +55,9 @@ end-start
 stopCluster(cl = cl)
 
 # write to disk
-# write_rds(glm_res_up, "03_outputs/GLM_res_upsampled.rds")
+write_rds(glm_res_up, "03_outputs/GLM_res_upsampled.rds")
 # read from disk
-glm_res_up <- read_rds("03_outputs/GLM_res_upsampled.rds")
+# glm_res_up <- read_rds("03_outputs/GLM_res_upsampled.rds")
 
 # metrics of resampled fit
 collect_metrics(glm_res_up)
@@ -91,7 +91,7 @@ glm_recipe_down <- recipe(fire ~ ., data = data_train) %>%
   step_zv(all_predictors()) %>%
   # remove highly-correlated features
   step_corr(all_numeric_predictors(),
-            threshold = .9) %>%
+            threshold = .75) %>%
   # remove ID for train set due to bugged step_nearmiss and step_tomek
   step_rm(id, skip = TRUE) %>%
   # create dummies for categorical features
@@ -130,9 +130,9 @@ end-start
 stopCluster(cl = cl)
 
 # write to disk
-# write_rds(glm_res_down, "03_outputs/GLM_res_downsampled.rds")
+write_rds(glm_res_down, "03_outputs/GLM_res_downsampled.rds")
 # read from disk
-glm_res_down <- read_rds("03_outputs/GLM_res_downsampled.rds")
+# glm_res_down <- read_rds("03_outputs/GLM_res_downsampled.rds")
 
 # metrics of resampled fit
 collect_metrics(glm_res_down)

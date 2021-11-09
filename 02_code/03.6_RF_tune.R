@@ -21,7 +21,7 @@ rf_recipe_up <- recipe(fire ~ ., data = data_train) %>%
   step_zv(all_predictors()) %>% 
   # remove highly-correlated features
   step_corr(all_numeric_predictors(),
-            threshold = .9) %>% 
+            threshold = .75) %>% 
   # remove ID for train set due to bugged step_nearmiss and step_tomek
   step_rm(id, skip = TRUE) %>% 
   # create dummies for categorical features
@@ -105,7 +105,7 @@ rf_recipe_down <- recipe(fire ~ ., data = data_train) %>%
   step_zv(all_predictors()) %>% 
   # remove highly-correlated features
   step_corr(all_numeric_predictors(),
-            threshold = .9) %>% 
+            threshold = .75) %>% 
   # remove ID for train set due to bugged step_nearmiss and step_tomek
   step_rm(id, skip = TRUE) %>% 
   # create dummies for categorical features

@@ -17,7 +17,7 @@ rf_recipe <- recipe(fire ~ ., data = data_train) %>%
   step_zv(all_predictors()) %>% 
   # remove highly-correlated features
   step_corr(all_numeric_predictors(),
-            threshold = .9)
+            threshold = .75)
 
 # bundle model and recipe to workflow
 rf_workflow <- workflow() %>% 
@@ -36,7 +36,7 @@ end-start
 # write to disk
 write_rds(rf_fit, "03_outputs/RF_naive.rds")
 # read from disk
-rf_fit <- read_rds("03_outputs/RF_naive.rds")
+# rf_fit <- read_rds("03_outputs/RF_naive.rds")
 
 # plot ROC curve
 predict(rf_fit, type = 'prob',

@@ -25,7 +25,7 @@ elanet_recipe_up <-  recipe(fire ~ ., data = data_train) %>%
   step_zv(all_predictors()) %>%
   # remove highly-correlated features
   step_corr(all_numeric_predictors(),
-            threshold = .9) %>% 
+            threshold = .75) %>% 
   # remove ID for train set due to bugged step_nearmiss and step_tomek
   step_rm(id, skip = TRUE) %>%
   # turn all categorical features into dummy variables
@@ -69,9 +69,9 @@ end-start
 stopCluster(cl = cl)
 
 # write to disk
-# write_rds(elanet_tune_up, "03_outputs/GLM_tune_upsampled.rds")
+write_rds(elanet_tune_up, "03_outputs/GLM_tune_upsampled.rds")
 # read from disk
-elanet_tune_up <- read_rds("03_outputs/GLM_tune_upsampled.rds")
+# elanet_tune_up <- read_rds("03_outputs/GLM_tune_upsampled.rds")
 
 # show metrics
 collect_metrics(elanet_tune_up)
@@ -122,7 +122,7 @@ elanet_recipe_down <- recipe(fire ~ ., data = data_train) %>%
   step_zv(all_predictors()) %>%
   # remove highly-correlated features
   step_corr(all_numeric_predictors(),
-            threshold = .9) %>% 
+            threshold = .75) %>% 
   # remove ID for train set due to bugged step_nearmiss and step_tomek
   step_rm(id, skip = TRUE) %>%
   # turn all categorical features into dummy variables
@@ -166,9 +166,9 @@ end-start
 stopCluster(cl = cl)
 
 # write to disk
-# write_rds(elanet_tune_down, "03_outputs/GLM_tune_downsampled.rds")
+write_rds(elanet_tune_down, "03_outputs/GLM_tune_downsampled.rds")
 # read from disk
-elanet_tune_down <- read_rds("03_outputs/GLM_tune_downsampled.rds")
+# elanet_tune_down <- read_rds("03_outputs/GLM_tune_downsampled.rds")
 
 # show metrics
 collect_metrics(elanet_tune_down)

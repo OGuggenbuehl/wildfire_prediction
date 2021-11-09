@@ -16,7 +16,7 @@ glm_recipe <-  recipe(fire ~ ., data = data_train) %>%
   step_zv(all_predictors()) %>%
   # remove highly-correlated features
   step_corr(all_numeric_predictors(),
-            threshold = .9)
+            threshold = .75)
 
 # bundle model and recipe to workflow
 glm_workflow <- workflow() %>% 
@@ -31,9 +31,9 @@ end <- Sys.time()
 end-start
 
 # write to disk
-# write_rds(glm_fit, "03_outputs/GLM_naive.rds")
+write_rds(glm_fit, "03_outputs/GLM_naive.rds")
 # read from disk
-glm_fit <- read_rds("03_outputs/GLM_naive.rds")
+# glm_fit <- read_rds("03_outputs/GLM_naive.rds")
 
 glm_naive_preds <- predict(glm_fit, type = 'prob',
                            new_data = data_test) %>% 

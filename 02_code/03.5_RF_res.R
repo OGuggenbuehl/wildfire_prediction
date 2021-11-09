@@ -17,7 +17,7 @@ rf_recipe_up <- recipe(fire ~ ., data = data_train) %>%
   step_zv(all_predictors()) %>% 
   # remove highly-correlated features
   step_corr(all_numeric_predictors(),
-            threshold = .9) %>% 
+            threshold = .75) %>% 
   # remove ID for train set due to bugged step_nearmiss and step_tomek
   step_rm(id, skip = TRUE) %>% 
   # create dummies for categorical features
@@ -54,9 +54,9 @@ end-start
 stopCluster(cl = cl)
 
 # write to disk
-write_rds(rf_res_up, "03_outputs/RF_res_downsampled.rds")
+write_rds(rf_res_up, "03_outputs/RF_res_upsampled.rds")
 # read from disk
-# rf_res_up <- read_rds("03_outputs/RF_res_downsampled.rds")
+# rf_res_up <- read_rds("03_outputs/RF_res_upsampled.rds")
 
 # metrics of resampled fit
 collect_metrics(rf_res_up)
@@ -67,7 +67,7 @@ rf_preds_up <- collect_predictions(rf_res_up,
 
 # plot ROC curve
 rf_preds_up %>% 
-  roc_curve(truth = fire, .pred_FALSE) %>% 
+  roc_curve(truth = fire, .pred_fire) %>% 
   autoplot()
 
 # confusion matrix
@@ -87,7 +87,7 @@ rf_recipe_down <- recipe(fire ~ ., data = data_train) %>%
   step_zv(all_predictors()) %>% 
   # remove highly-correlated features
   step_corr(all_numeric_predictors(),
-            threshold = .9) %>% 
+            threshold = .75) %>% 
   # remove ID for train set due to bugged step_nearmiss and step_tomek
   step_rm(id, skip = TRUE) %>% 
   # create dummies for categorical features
@@ -139,7 +139,7 @@ rf_preds_down <- collect_predictions(rf_res_down,
 
 # plot ROC curve
 rf_preds_down %>% 
-  roc_curve(truth = fire, .pred_FALSE) %>% 
+  roc_curve(truth = fire, .pred_fire) %>% 
   autoplot()
 
 # confusion matrix

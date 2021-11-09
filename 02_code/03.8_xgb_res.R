@@ -23,7 +23,7 @@ xgb_recipe_up <- recipe(fire ~ ., data = data_train) %>%
   step_zv(all_predictors()) %>%
   # remove highly-correlated features
   step_corr(all_numeric_predictors(),
-            threshold = .9)
+            threshold = .75)
 
 # bundle model and recipe to workflow
 xgb_workflow_up <- workflow() %>% 
@@ -48,7 +48,7 @@ end-start
 stopCluster(cl = cl)
 
 # write to disk
-# write_rds(xgb_res_up, "03_outputs/XGB_res_upsampled.rds")
+write_rds(xgb_res_up, "03_outputs/XGB_res_upsampled.rds")
 # read from disk
 xgb_res_up <- read_rds("03_outputs/XGB_res_upsampled.rds")
 
@@ -81,7 +81,7 @@ xgb_recipe_down <- recipe(fire ~ ., data = data_train) %>%
   step_zv(all_predictors()) %>% 
   # remove highly-correlated features
   step_corr(all_numeric_predictors(),
-            threshold = .9) %>% 
+            threshold = .75) %>% 
   # remove ID for train set due to bugged step_nearmiss and step_tomek
   step_rm(id, skip = TRUE) %>% 
   # create dummies for categorical features
@@ -120,7 +120,7 @@ end-start
 stopCluster(cl = cl)
 
 # write to disk
-# write_rds(xgb_res_down, "03_outputs/XGB_res_downsampled.rds")
+write_rds(xgb_res_down, "03_outputs/XGB_res_downsampled.rds")
 # read from disk
 xgb_res_down <- read_rds("03_outputs/XGB_res_downsampled.rds")
 
