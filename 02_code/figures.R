@@ -18,6 +18,8 @@ data_monthly %>%
        y = 'number of recorded wildfires',
        x = 'month of recording')
 
+ggsave("03_outputs/plots/distr_monthly.png")
+
 data_monthly %>% 
   mutate(fire = recode(as.character(fire), 
                        'TRUE' = 'fire', 
@@ -39,3 +41,4 @@ data_seasonal %>%
   geom_label(aes(label = percent(share, accuracy = 0.1), y = 0.1))+
   theme_minimal()
 
+ggsave("03_outputs/plots/class_imbalance.png")

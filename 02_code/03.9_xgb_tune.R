@@ -62,11 +62,8 @@ xgb_tune_up <- xgb_workflow_up %>%
 end <- Sys.time()
 end-start
 
-# shut down workers
-stopCluster(cl = cl)
-
 # write to disk
-write_rds(xgb_tune_up, "03_outputs/XGB_tuned_upsampled.rds")
+# write_rds(xgb_tune_up, "03_outputs/XGB_tuned_upsampled.rds")
 # read from disk
 xgb_tune_up <- read_rds("03_outputs/XGB_tuned_upsampled.rds")
 
@@ -77,11 +74,9 @@ collect_metrics(xgb_tune_up) %>%
 
 show_best(xgb_tune_up, "f_meas") %>% select(.metric, mean)
 show_best(xgb_tune_up, "roc_auc") %>% select(.metric, mean)
-show_best(xgb_tune_up, "precision") %>% select(.metric, mean)
-show_best(xgb_tune_up, "recall") %>% select(.metric, mean)
 
 # select best tuning specification
-best_xgb_up <- select_best(xgb_tune_up, "f_meas")
+best_xgb_up <- select_best(xgb_tune_up, "classification_cost_penalized")
 
 # finalize workflow with best tuning parameters
 best_xgb_wf_up <- xgb_workflow_up %>% 
@@ -91,6 +86,13 @@ best_xgb_wf_up <- xgb_workflow_up %>%
 xgb_fit_final_up <- best_xgb_wf_up %>%
   last_fit(split = t_split, 
            metrics = metrics)
+
+# shut down workers
+stopCluster(cl = cl)
+
+# write to disk
+write_rds(xgb_fit_final_up, "03_outputs/XGB_final_upsampled.rds")
+
 # metrics
 xgb_fit_final_up %>%
   collect_metrics()
@@ -157,11 +159,8 @@ xgb_tune_down <- xgb_workflow_down %>%
 end <- Sys.time()
 end-start
 
-# shut down workers
-stopCluster(cl = cl)
-
 # write to disk
-write_rds(xgb_tune_down, "03_outputs/XGB_tuned_downsampled.rds")
+# write_rds(xgb_tune_down, "03_outputs/XGB_tuned_downsampled.rds")
 # read from disk
 xgb_tune_down <- read_rds("03_outputs/XGB_tuned_downsampled.rds")
 
@@ -170,6 +169,7 @@ collect_metrics(xgb_tune_down) %>%
   select(-c(n, std_err, .config)) %>% 
   pivot_wider(names_from = .metric, values_from = mean) %>% View()
 show_best(xgb_tune_down, "f_meas")
+show_best(xgb_tune_down, "roc_auc")
 show_best(xgb_tune_down, "roc_auc")
 
 # select best tuning specification
@@ -183,6 +183,13 @@ best_xgb_wf_down <- xgb_workflow_down %>%
 xgb_fit_final_down <- best_xgb_wf_down %>%
   last_fit(split = t_split, 
            metrics = metrics)
+
+# shut down workers
+stopCluster(cl = cl)
+
+# write to disk
+write_rds(xgb_fit_final_down, "03_outputs/XGB_final_downsampled.rds")
+
 # metrics
 xgb_fit_final_down %>%
   collect_metrics()

@@ -162,9 +162,6 @@ elanet_tune_down <- elanet_wf_down %>%
 end <- Sys.time()
 end-start
 
-# shut down workers
-stopCluster(cl = cl)
-
 # write to disk
 write_rds(elanet_tune_down, "03_outputs/GLM_tune_downsampled.rds")
 # read from disk
@@ -186,6 +183,9 @@ final_elanet_wf_down <- elanet_wf_down %>%
 final_elanet_fit_down <- final_elanet_wf_down %>%
   last_fit(split = t_split, 
            metrics = metrics)
+
+# shut down workers
+stopCluster(cl = cl)
 
 # metrics
 final_elanet_fit_down %>%
