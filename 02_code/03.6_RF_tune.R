@@ -99,10 +99,9 @@ rf_fit_final_up %>%
   autoplot()
 
 # confusion matrix
-rf_confmat_up <- rf_fit_final_up %>%
+rf_fit_final_up %>%
   collect_predictions() %>% 
   conf_mat(truth = fire, estimate = .pred_class)
-rf_confmat_up
 
 # Downsampling with NearMiss 1 --------------------------------------------
 
@@ -191,7 +190,6 @@ rf_fit_final_down %>%
   autoplot()
 
 # confusion matrix
-rf_confmat_down <- rf_fit_final_down %>%
+rf_fit_final_down %>%
   collect_predictions() %>% 
   conf_mat(truth = fire, estimate = .pred_class)
-rf_confmat_down

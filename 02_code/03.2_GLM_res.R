@@ -72,12 +72,8 @@ glm_preds_up %>%
   autoplot()
 
 # confusion matrix
-glm_confmat_up <- glm_preds_up %>% 
+glm_preds_up %>% 
   conf_mat(truth = fire, estimate = .pred_class)
-glm_confmat_up
-
-# additional metrics 
-summary(glm_confmat_up)
 
 # Downsampling using NearMiss 1 -------------------------------------------
 
@@ -147,9 +143,5 @@ glm_preds_down %>%
   autoplot()
 
 # confusion matrix
-glm_confmat_down <- glm_preds_down %>% 
+glm_preds_down %>% 
   conf_mat(truth = fire, estimate = .pred_class)
-glm_confmat_down
-
-# additional metrics 
-summary(glm_confmat_down)

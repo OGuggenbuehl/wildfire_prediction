@@ -1,5 +1,9 @@
 library(stacks)
 
+glm_tune <- read_rds("03_outputs/GLM_tune_upsampled.rds")
+rf_tune <- read_rds("03_outputs/RF_final_upsampled.rds")
+xgb_tune <- read_rds("03_outputs/XGB_final_upsampled.rds")
+
 # create stack
 model_stack <- stacks() %>%
   # add candidate models

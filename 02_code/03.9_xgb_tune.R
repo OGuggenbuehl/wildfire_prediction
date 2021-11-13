@@ -13,7 +13,6 @@ xgb_model <-
   set_engine("xgboost") %>% 
   set_mode("classification")
 
-
 # Upsampling with SMOTE ---------------------------------------------------
 
 # preprocessing recipe
@@ -104,10 +103,9 @@ xgb_fit_final_up %>%
   autoplot()
 
 # confusion matrix
-xgb_confmat_up <- xgb_fit_final_up %>%
+xgb_fit_final_up %>%
   collect_predictions() %>% 
   conf_mat(truth = fire, estimate = .pred_class)
-xgb_confmat_up
 
 # Downsampling with NearMiss 1 --------------------------------------------
 
@@ -201,7 +199,6 @@ xgb_fit_final_down %>%
   autoplot()
 
 # confusion matrix
-xgb_confmat_down <- xgb_fit_final_down %>%
+xgb_fit_final_down %>%
   collect_predictions() %>% 
   conf_mat(truth = fire, estimate = .pred_class)
-xgb_confmat_down

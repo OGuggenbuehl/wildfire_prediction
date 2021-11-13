@@ -71,9 +71,8 @@ xgb_preds_up %>%
   autoplot()
 
 # confusion matrix
-xgb_confmat_up <- xgb_preds_up %>% 
+xgb_preds_up %>% 
   conf_mat(truth = fire, estimate = .pred_class)
-xgb_confmat_up
 
 # Downsampling ------------------------------------------------------------
 
@@ -143,6 +142,5 @@ xgb_preds_down %>%
   autoplot()
 
 # confusion matrix
-xgb_confmat_down <- xgb_preds_down %>% 
+xgb_preds_down %>% 
   conf_mat(truth = fire, estimate = .pred_class)
-xgb_confmat_down
