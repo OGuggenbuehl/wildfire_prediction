@@ -56,7 +56,7 @@ stopCluster(cl = cl)
 # write to disk
 write_rds(xgb_res_up, "03_outputs/XGB_res_upsampled.rds")
 # read from disk
-xgb_res_up <- read_rds("03_outputs/XGB_res_upsampled.rds")
+# xgb_res_up <- read_rds("03_outputs/XGB_res_upsampled.rds")
 
 # metrics of resampled fit
 collect_metrics(xgb_res_up)
@@ -127,7 +127,7 @@ stopCluster(cl = cl)
 # write to disk
 write_rds(xgb_res_down, "03_outputs/XGB_res_downsampled.rds")
 # read from disk
-xgb_res_down <- read_rds("03_outputs/XGB_res_downsampled.rds")
+# xgb_res_down <- read_rds("03_outputs/XGB_res_downsampled.rds")
 
 # metrics of resampled fit
 collect_metrics(xgb_res_down)

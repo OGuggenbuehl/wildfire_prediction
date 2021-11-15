@@ -64,9 +64,6 @@ rf_tune_up <- read_rds("03_outputs/RF_tuned_upsampled.rds")
 
 # show metrics
 collect_metrics(rf_tune_up)
-show_best(rf_tune_up, "f_meas")
-show_best(rf_tune_up, "roc_auc")
-show_best(rf_tune_up, "classification_cost_penalized")
 
 # select best tuning specification
 best_rf_up <- select_best(rf_tune_up, "classification_cost_penalized")
@@ -160,9 +157,6 @@ rf_tune_down <- read_rds("03_outputs/RF_tuned_downsampled.rds")
 
 # show metrics
 collect_metrics(rf_tune_down)
-show_best(rf_tune_down, "f_meas")
-show_best(rf_tune_down, "roc_auc")
-show_best(rf_tune_down, "classification_cost_penalized")
 
 # select best tuning specification
 best_rf_down <- select_best(rf_tune_down, "classification_cost_penalized")
@@ -178,6 +172,11 @@ rf_fit_final_down <- best_rf_wf_down %>%
 
 # shut down workers
 stopCluster(cl = cl)
+
+# write to disk
+# write_rds(rf_fit_final_down, "03_outputs/RF_final_downsampled.rds")
+# read from disk
+rf_fit_final_down <- read_rds("03_outputs/RF_final_downsampled.rds")
 
 # metrics
 rf_fit_final_down %>%

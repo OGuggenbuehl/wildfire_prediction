@@ -65,9 +65,6 @@ elanet_tune_up <- elanet_wf_up %>%
 end <- Sys.time()
 end-start
 
-# shut down workers
-stopCluster(cl = cl)
-
 # write to disk
 # write_rds(elanet_tune_up, "03_outputs/GLM_tune_upsampled.rds")
 # read from disk
@@ -75,8 +72,6 @@ elanet_tune_up <- read_rds("03_outputs/GLM_tune_upsampled.rds")
 
 # show metrics
 collect_metrics(elanet_tune_up)
-show_best(elanet_tune_up, "f_meas")
-show_best(elanet_tune_up, "roc_auc")
 
 # select best tuning specification
 best_elanet_up <- select_best(elanet_tune_up, "classification_cost_penalized")
@@ -94,6 +89,9 @@ final_elanet_fit_up <- final_elanet_wf_up %>%
 # write_rds(final_elanet_fit_up, "03_outputs/GLM_final_upsampled.rds")
 # read from disk
 final_elanet_fit_up <- read_rds("03_outputs/GLM_final_upsampled.rds")
+
+# shut down workers
+stopCluster(cl = cl)
 
 # metrics
 final_elanet_fit_up %>%
@@ -174,8 +172,6 @@ elanet_tune_down <- read_rds("03_outputs/GLM_tune_downsampled.rds")
 
 # show metrics
 collect_metrics(elanet_tune_down)
-show_best(elanet_tune_down, "f_meas")
-show_best(elanet_tune_down, "roc_auc")
 
 # select best tuning specification
 best_elanet_down <- select_best(elanet_tune_down, "classification_cost_penalized")

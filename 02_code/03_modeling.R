@@ -54,10 +54,16 @@ metrics <- metric_set(classification_cost_penalized,
                       f_meas, precision, recall,
                       sensitivity, specificity,
                       accuracy, roc_auc)
+
 # fit control
 control <- control_resamples(
+  # verbose for convenience 
   verbose = TRUE,
+  # needed for stacking
   save_pred = TRUE,
+  # needed for stacking
+  save_workflow = TRUE,
+  # needed for parallelization
   allow_par = TRUE, 
   parallel_over = 'resamples')
 

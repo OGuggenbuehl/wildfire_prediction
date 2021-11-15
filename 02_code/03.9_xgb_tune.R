@@ -69,10 +69,7 @@ xgb_tune_up <- read_rds("03_outputs/XGB_tuned_upsampled.rds")
 # show metrics
 collect_metrics(xgb_tune_up) %>% 
   select(-c(n, std_err, .config)) %>% 
-  pivot_wider(names_from = .metric, values_from = mean) %>% View()
-
-show_best(xgb_tune_up, "f_meas") %>% select(.metric, mean)
-show_best(xgb_tune_up, "roc_auc") %>% select(.metric, mean)
+  pivot_wider(names_from = .metric, values_from = mean)
 
 # select best tuning specification
 best_xgb_up <- select_best(xgb_tune_up, "classification_cost_penalized")
@@ -90,7 +87,9 @@ xgb_fit_final_up <- best_xgb_wf_up %>%
 stopCluster(cl = cl)
 
 # write to disk
-write_rds(xgb_fit_final_up, "03_outputs/XGB_final_upsampled.rds")
+# write_rds(xgb_fit_final_up, "03_outputs/XGB_final_upsampled.rds")
+# read from disk
+xgb_fit_final_up <- read_rds("03_outputs/XGB_final_upsampled.rds")
 
 # metrics
 xgb_fit_final_up %>%
@@ -165,10 +164,7 @@ xgb_tune_down <- read_rds("03_outputs/XGB_tuned_downsampled.rds")
 # show metrics
 collect_metrics(xgb_tune_down) %>% 
   select(-c(n, std_err, .config)) %>% 
-  pivot_wider(names_from = .metric, values_from = mean) %>% View()
-show_best(xgb_tune_down, "f_meas")
-show_best(xgb_tune_down, "roc_auc")
-show_best(xgb_tune_down, "roc_auc")
+  pivot_wider(names_from = .metric, values_from = mean)
 
 # select best tuning specification
 best_xgb_down <- select_best(xgb_tune_down, "classification_cost_penalized")
@@ -186,7 +182,9 @@ xgb_fit_final_down <- best_xgb_wf_down %>%
 stopCluster(cl = cl)
 
 # write to disk
-write_rds(xgb_fit_final_down, "03_outputs/XGB_final_downsampled.rds")
+# write_rds(xgb_fit_final_down, "03_outputs/XGB_final_downsampled.rds")
+# read from disk
+xgb_fit_final_down <- read_rds("03_outputs/XGB_final_downsampled.rds")
 
 # metrics
 xgb_fit_final_down %>%
