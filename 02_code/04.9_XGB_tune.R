@@ -4,8 +4,9 @@
 xgb_fit_final_up <- read_rds("03_outputs/XGB_final_upsampled.rds")
 
 # metrics
-xgb_fit_final_up %>%
-  collect_metrics()
+xgb_tuned_up_metrics <- xgb_fit_final_up %>%
+  collect_metrics() %>% 
+  mutate(model = 'XGB_tuned_upsampled')
 
 # ROC curve
 xgb_fit_final_up %>%
@@ -24,8 +25,9 @@ xgb_fit_final_up %>%
 xgb_fit_final_down <- read_rds("03_outputs/XGB_final_downsampled.rds")
 
 # metrics
-xgb_fit_final_down %>%
-  collect_metrics()
+xgb_tuned_down_metrics <- xgb_fit_final_down %>%
+  collect_metrics() %>% 
+  mutate(model = 'XGB_tuned_downsampled')
 
 # ROC curve
 xgb_fit_final_down %>%

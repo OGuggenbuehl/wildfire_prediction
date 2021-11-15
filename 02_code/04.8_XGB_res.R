@@ -4,7 +4,8 @@
 xgb_res_up <- read_rds("03_outputs/XGB_res_upsampled.rds")
 
 # metrics of resampled fit
-collect_metrics(xgb_res_up)
+xgb_res_up_metrics <- collect_metrics(xgb_res_up) %>% 
+  mutate(model = 'XGB_res_upsampled')
 
 # summarize within-fold predictions
 xgb_preds_up <- collect_predictions(xgb_res_up, 
@@ -25,7 +26,8 @@ xgb_preds_up %>%
 xgb_res_down <- read_rds("03_outputs/XGB_res_downsampled.rds")
 
 # metrics of resampled fit
-collect_metrics(xgb_res_down)
+xgb_res_down_metrics <- collect_metrics(xgb_res_down) %>% 
+  mutate(model = 'XGB_res_downsampled')
 
 # summarize within-fold predictions
 xgb_preds_down <- collect_predictions(xgb_res_down, 

@@ -4,7 +4,8 @@
 glm_res_up <- read_rds("03_outputs/GLM_res_upsampled.rds")
 
 # metrics of resampled fit
-collect_metrics(glm_res_up)
+glm_res_up_metrics <- collect_metrics(glm_res_up) %>% 
+  mutate(model = 'GLM_res_upsampled')
 
 # summarize within-fold predictions
 glm_preds_up <- collect_predictions(glm_res_up, 
@@ -25,7 +26,8 @@ glm_preds_up %>%
 glm_res_down <- read_rds("03_outputs/GLM_res_downsampled.rds")
 
 # metrics of resampled fit
-collect_metrics(glm_res_down)
+glm_res_down_metrics <- collect_metrics(glm_res_down) %>% 
+  mutate(model = 'GLM_res_downsampled')
 
 # summarize within-fold predictions
 glm_preds_down <- collect_predictions(glm_res_down, 

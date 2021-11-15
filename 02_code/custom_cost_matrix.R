@@ -11,6 +11,3 @@ classification_cost_penalized <- metric_tweak(
   .fn = classification_cost,
   costs = !!cost_matrix
 )
-
-
-
