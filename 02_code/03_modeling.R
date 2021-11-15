@@ -40,6 +40,10 @@ t_split <- initial_time_split(data %>% arrange(year),
 data_train <- training(t_split)
 data_test <- testing(t_split)
 
+# write to disk
+write_rds(data_train, "01_data/data_train.rds")
+write_rds(data_test, "01_data/data_test.rds")
+
 # Modeling Setup ----------------------------------------------------------
 
 set.seed(123)
@@ -73,27 +77,33 @@ all_cores <- detectCores(logical = FALSE)
 
 # GLM ---------------------------------------------------------------------
 # naive estimation
-source("02_code/03.1_GLM_naive.R")
+source("02_code/03.1_GLM_naive.R", echo = TRUE)
 # resampled
-source("02_code/03.2_GLM_res.R")
-# tuned elastic net
-source("02_code/03.3_GLM_tune.R")
+source("02_code/03.2_GLM_res.R", echo = TRUE)
+# tune elastic net
+source("02_code/03.3_GLM_tune.R", echo = TRUE)
+# final fit
+source("02_code/03.4_GLM_final.R", echo = TRUE)
 
 # Random Forest -----------------------------------------------------------
 # naive estimation
-source("02_code/03.4_RF_naive.R")
+source("02_code/03.5_RF_naive.R", echo = TRUE)
 # resampled
-source("02_code/03.5_RF_res.R")
+source("02_code/03.6_RF_res.R", echo = TRUE)
 # tuned
-source("02_code/03.6_RF_tune.R")
+source("02_code/03.7_RF_tune.R", echo = TRUE)
+# final fit
+source("02_code/03.8_RF_final.R", echo = TRUE)
 
 # XGB ---------------------------------------------------------------------
 # naive
-source("02_code/03.7_XGB_naive.R")
+source("02_code/03.9_XGB_naive.R", echo = TRUE)
 # resampled
-source("02_code/03.8_XGB_res.R")
+source("02_code/03.10_XGB_res.R", echo = TRUE)
 # tune
-source("02_code/03.9_XGB_tune.R")
+source("02_code/03.11_XGB_tune.R", echo = TRUE)
+# final fit
+source("02_code/03.12_XGB_final.R", echo = TRUE)
 
 # Stacking ----------------------------------------------------------------
-source("02_code/03.10_stacking.R")
+source("02_code/03.13_stacking.R", echo = TRUE)

@@ -57,48 +57,11 @@ rf_tune_up <- rf_workflow_up %>%
 end <- Sys.time()
 end-start
 
-# write to disk
-# write_rds(rf_tune_up, "03_outputs/RF_tuned_upsampled.rds")
-# read from disk
-rf_tune_up <- read_rds("03_outputs/RF_tuned_upsampled.rds")
-
-# show metrics
-collect_metrics(rf_tune_up)
-
-# select best tuning specification
-best_rf_up <- select_best(rf_tune_up, "classification_cost_penalized")
-
-# finalize workflow with best tuning parameters
-best_rf_wf_up <- rf_workflow_up %>% 
-  finalize_workflow(best_rf_up)
-
-# fit final RF model
-rf_fit_final_up <- best_rf_wf_up %>%
-  last_fit(split = t_split, 
-           metrics = metrics)
-
-# write to disk
-# write_rds(rf_fit_final_up, "03_outputs/RF_final_upsampled.rds")
-# read from disk
-rf_fit_final_up <- read_rds("03_outputs/RF_final_upsampled.rds")
-
 # shut down workers
 stopCluster(cl = cl)
 
-# metrics
-rf_fit_final_up %>%
-  collect_metrics()
-
-# ROC curve
-rf_fit_final_up %>%
-  collect_predictions() %>% 
-  roc_curve(fire, .pred_fire) %>% 
-  autoplot()
-
-# confusion matrix
-rf_fit_final_up %>%
-  collect_predictions() %>% 
-  conf_mat(truth = fire, estimate = .pred_class)
+# write to disk
+write_rds(rf_tune_up, "03_outputs/RF_tuned_upsampled.rds")
 
 # Downsampling with NearMiss 1 --------------------------------------------
 
@@ -150,45 +113,8 @@ rf_tune_down <- rf_workflow_down %>%
 end <- Sys.time()
 end-start
 
-# write to disk
-# write_rds(rf_tune_down, "03_outputs/RF_tuned_downsampled.rds")
-# read from disk
-rf_tune_down <- read_rds("03_outputs/RF_tuned_downsampled.rds")
-
-# show metrics
-collect_metrics(rf_tune_down)
-
-# select best tuning specification
-best_rf_down <- select_best(rf_tune_down, "classification_cost_penalized")
-
-# finalize workflow with best tuning parameters
-best_rf_wf_down <- rf_workflow_down %>% 
-  finalize_workflow(best_rf_down)
-
-# fit final RF model
-rf_fit_final_down <- best_rf_wf_down %>%
-  last_fit(split = t_split, 
-           metrics = metrics)
-
 # shut down workers
 stopCluster(cl = cl)
 
 # write to disk
-# write_rds(rf_fit_final_down, "03_outputs/RF_final_downsampled.rds")
-# read from disk
-rf_fit_final_down <- read_rds("03_outputs/RF_final_downsampled.rds")
-
-# metrics
-rf_fit_final_down %>%
-  collect_metrics()
-
-# ROC curve
-rf_fit_final_down %>%
-  collect_predictions() %>% 
-  roc_curve(fire, .pred_fire) %>% 
-  autoplot()
-
-# confusion matrix
-rf_fit_final_down %>%
-  collect_predictions() %>% 
-  conf_mat(truth = fire, estimate = .pred_class)
+write_rds(rf_tune_down, "03_outputs/RF_tuned_downsampled.rds")

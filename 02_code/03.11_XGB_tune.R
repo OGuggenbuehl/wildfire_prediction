@@ -1,14 +1,22 @@
-library(ranger)
+library(xgboost)
 
 # specify model
-rf_model <- rand_forest() %>% 
-  set_engine("ranger") %>% 
+xgb_model <- 
+  # enable tuning of hyperparameters
+  boost_tree(trees = 500, 
+             tree_depth = tune(), 
+             min_n = tune(), 
+             loss_reduction = tune(),
+             sample_size = tune(), 
+             mtry = tune(),
+             learn_rate = tune()) %>% 
+  set_engine("xgboost") %>% 
   set_mode("classification")
 
 # Upsampling with SMOTE ---------------------------------------------------
 
 # preprocessing recipe
-rf_recipe_up <- recipe(fire ~ ., data = data_train) %>% 
+xgb_recipe_up <- recipe(fire ~ ., data = data_train) %>% 
   update_role(id, new_role = "ID") %>% 
   # drop highly correlated features
   step_rm(lake, river, powerline, road,
@@ -24,28 +32,31 @@ rf_recipe_up <- recipe(fire ~ ., data = data_train) %>%
   step_dummy(all_nominal_predictors()) %>% 
   # downsampling with NearMiss 1
   step_smote(fire,
-                # skip for test set
-                skip = TRUE) %>% 
+             # skip for test set
+             skip = TRUE) %>% 
   # remove TOMEK-links for better class boundaries
   step_tomek(fire, 
              # skip for test set
              skip = TRUE)
 
 # bundle model and recipe to workflow
-rf_workflow_up <- workflow() %>% 
-  add_model(rf_model) %>% 
-  add_recipe(rf_recipe_up)
+xgb_workflow_up <- workflow() %>% 
+  add_model(xgb_model) %>% 
+  add_recipe(xgb_recipe_up)
 
 # register parallel-processing backend
 cl <- makeCluster(all_cores)
 plan(cluster, workers = cl)
 
-# fit model
+# tune with 5-fold CV
 start <- Sys.time()
-rf_res_up <- rf_workflow_up %>% 
-  fit_resamples(resamples = cv_splits, 
-                metrics = metrics, 
-                control = control
+xgb_tune_up <- xgb_workflow_up %>% 
+  # set up tuning grid
+  tune_grid(
+    resamples = cv_splits,
+    grid = 20,
+    metrics = metrics, 
+    control = control
   )
 end <- Sys.time()
 end-start
@@ -54,30 +65,12 @@ end-start
 stopCluster(cl = cl)
 
 # write to disk
-write_rds(rf_res_up, "03_outputs/RF_res_upsampled.rds")
-# read from disk
-# rf_res_up <- read_rds("03_outputs/RF_res_upsampled.rds")
-
-# metrics of resampled fit
-collect_metrics(rf_res_up)
-
-# summarize within-fold predictions
-rf_preds_up <- collect_predictions(rf_res_up, 
-                                summarize = TRUE)
-
-# plot ROC curve
-rf_preds_up %>% 
-  roc_curve(truth = fire, .pred_fire) %>% 
-  autoplot()
-
-# confusion matrix
-rf_preds_up %>% 
-  conf_mat(truth = fire, estimate = .pred_class)
+write_rds(xgb_tune_up, "03_outputs/XGB_tuned_upsampled.rds")
 
 # Downsampling with NearMiss 1 --------------------------------------------
 
 # preprocessing recipe
-rf_recipe_down <- recipe(fire ~ ., data = data_train) %>% 
+xgb_recipe_down <- recipe(fire ~ ., data = data_train) %>% 
   update_role(id, new_role = "ID") %>% 
   # drop highly correlated features
   step_rm(lake, river, powerline, road, 
@@ -103,20 +96,23 @@ rf_recipe_down <- recipe(fire ~ ., data = data_train) %>%
              skip = TRUE)
 
 # bundle model and recipe to workflow
-rf_workflow_down <- workflow() %>% 
-  add_model(rf_model) %>% 
-  add_recipe(rf_recipe_down)
+xgb_workflow_down <- workflow() %>% 
+  add_model(xgb_model) %>% 
+  add_recipe(xgb_recipe_down)
 
 # register parallel-processing backend
 cl <- makeCluster(all_cores)
 plan(cluster, workers = cl)
 
-# fit model
+# tune with 5-fold CV
 start <- Sys.time()
-rf_res_down <- rf_workflow_down %>% 
-  fit_resamples(resamples = cv_splits, 
-                metrics = metrics, 
-                control = control
+xgb_tune_down <- xgb_workflow_down %>% 
+  # set up tuning grid
+  tune_grid(
+    resamples = cv_splits,
+    grid = 40,
+    metrics = metrics, 
+    control = control
   )
 end <- Sys.time()
 end-start
@@ -125,22 +121,4 @@ end-start
 stopCluster(cl = cl)
 
 # write to disk
-write_rds(rf_res_down, "03_outputs/RF_res_downsampled.rds")
-# read from disk
-# rf_res_down <- read_rds("03_outputs/RF_res_downsampled.rds")
-
-# metrics of resampled fit
-collect_metrics(rf_res_down)
-
-# summarize within-fold predictions
-rf_preds_down <- collect_predictions(rf_res_down, 
-                                     summarize = TRUE)
-
-# plot ROC curve
-rf_preds_down %>% 
-  roc_curve(truth = fire, .pred_fire) %>% 
-  autoplot()
-
-# confusion matrix
-rf_preds_down %>% 
-  conf_mat(truth = fire, estimate = .pred_class)
+write_rds(xgb_tune_down, "03_outputs/XGB_tuned_downsampled.rds")
