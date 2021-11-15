@@ -5,6 +5,14 @@ library(tidymodels)
 data_train <- read_rds("01_data/data_train.rds")
 data_test <- read_rds("01_data/data_test.rds")
 
+my_metrics <- c("classification_cost_penalized",
+                "f_meas", "precision", "recall",
+                "sensitivity", "specificity",
+                "accuracy", "roc_auc")
+
+# load custom classification metric
+source("02_code/custom_cost_matrix.R")
+
 # GLM ---------------------------------------------------------------------
 # naive estimation
 source("02_code/04.1_GLM_naive.R", echo = TRUE)
@@ -31,3 +39,23 @@ source("02_code/04.9_XGB_tune.R", echo = TRUE)
 
 # Stacking ----------------------------------------------------------------
 source("02_code/04.10_stacking.R", echo = TRUE)
+
+glm_res_up_metrics %>% 
+  bind_rows(glm_res_down_metrics) %>% 
+  bind_rows(glm_tuned_up_metrics) %>% 
+  bind_rows(glm_tuned_down_metrics) %>% 
+  bind_rows(rf_res_up_metrics) %>% 
+  bind_rows(rf_res_down_metrics) %>% 
+  bind_rows(rf_tuned_up_metrics) %>% 
+  bind_rows(rf_tuned_down_metrics) %>%
+  bind_rows(xgb_res_up_metrics) %>% 
+  bind_rows(xgb_res_down_metrics) %>% 
+  bind_rows(xgb_tuned_up_metrics) %>% 
+  bind_rows(xgb_tuned_down_metrics) %>% 
+  mutate(.estimate = if_else(is.na(.estimate), true = mean, false = .estimate)) %>% 
+  select(.metric, .estimate, model) %>% 
+  bind_rows(glm_naive_metrics) %>% 
+  bind_rows(rf_naive_metrics) %>% 
+  bind_rows(xgb_naive_metrics) %>% 
+  filter(.metric %in% my_metrics) %>% 
+  arrange(model, .metric) %>% View()
