@@ -9,7 +9,7 @@ collect_metrics(xgb_tune_up) %>%
   pivot_wider(names_from = .metric, values_from = mean)
 
 # select best tuning specification
-best_xgb_up <- select_best(xgb_tune_up, "classification_cost_penalized")
+best_xgb_up <- select_best(xgb_tune_up, "roc_auc")
 
 # finalize workflow with best tuning parameters
 best_xgb_wf_up <- xgb_workflow_up %>% 
@@ -41,7 +41,7 @@ collect_metrics(xgb_tune_down) %>%
   pivot_wider(names_from = .metric, values_from = mean)
 
 # select best tuning specification
-best_xgb_down <- select_best(xgb_tune_down, "classification_cost_penalized")
+best_xgb_down <- select_best(xgb_tune_down, "roc_auc")
 
 # finalize workflow with best tuning parameters
 best_xgb_wf_down <- xgb_workflow_down %>% 

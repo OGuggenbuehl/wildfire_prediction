@@ -7,7 +7,7 @@ rf_tune_up <- read_rds("03_outputs/RF_tuned_upsampled.rds")
 collect_metrics(rf_tune_up)
 
 # select best tuning specification
-best_rf_up <- select_best(rf_tune_up, "classification_cost_penalized")
+best_rf_up <- select_best(rf_tune_up, "roc_auc")
 
 # finalize workflow with best tuning parameters
 best_rf_wf_up <- rf_workflow_up %>% 
@@ -36,7 +36,7 @@ rf_tune_down <- read_rds("03_outputs/RF_tuned_downsampled.rds")
 collect_metrics(rf_tune_down)
 
 # select best tuning specification
-best_rf_down <- select_best(rf_tune_down, "classification_cost_penalized")
+best_rf_down <- select_best(rf_tune_down, "roc_auc")
 
 # finalize workflow with best tuning parameters
 best_rf_wf_down <- rf_workflow_down %>% 

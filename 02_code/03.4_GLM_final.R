@@ -7,7 +7,7 @@ elanet_tune_up <- read_rds("03_outputs/GLM_tune_upsampled.rds")
 collect_metrics(elanet_tune_up)
 
 # select best tuning specification
-best_elanet_up <- select_best(elanet_tune_up, "classification_cost_penalized")
+best_elanet_up <- select_best(elanet_tune_up, "roc_auc")
 
 # finalize workflow with best tuning parameters
 final_elanet_wf_up <- elanet_wf_up %>% 
@@ -37,7 +37,7 @@ elanet_tune_down <- read_rds("03_outputs/GLM_tune_downsampled.rds")
 collect_metrics(elanet_tune_down)
 
 # select best tuning specification
-best_elanet_down <- select_best(elanet_tune_down, "classification_cost_penalized")
+best_elanet_down <- select_best(elanet_tune_down, "roc_auc")
 
 # finalize workflow with best tuning parameters
 final_elanet_wf_down <- elanet_wf_down %>% 
