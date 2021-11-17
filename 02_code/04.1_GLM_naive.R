@@ -21,6 +21,9 @@ glm_confmat
 
 # metrics 
 glm_naive_metrics <- summary(glm_confmat) %>% 
+  bind_rows(roc_auc(truth = fire, 
+                    .pred_fire, 
+                    data = glm_naive_preds)) %>% 
   bind_rows(classification_cost_penalized(truth = fire, 
                                           .pred_fire, 
                                           data = glm_naive_preds)) %>% 

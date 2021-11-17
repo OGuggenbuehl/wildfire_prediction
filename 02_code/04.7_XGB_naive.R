@@ -21,6 +21,9 @@ xgb_confmat
 
 # metrics 
 xgb_naive_metrics <- summary(xgb_confmat) %>% 
+  bind_rows(roc_auc(truth = fire, 
+                    .pred_fire, 
+                    data = rf_naive_preds)) %>% 
   bind_rows(classification_cost_penalized(truth = fire, 
                                           .pred_fire, 
                                           data = xgb_naive_preds)) %>% 
