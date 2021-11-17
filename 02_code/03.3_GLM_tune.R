@@ -69,7 +69,7 @@ end-start
 stopCluster(cl = cl)
 
 # write to disk
-write_rds(elanet_tune_up, "03_outputs/GLM_tune_upsampled.rds")
+write_rds(elanet_tune_up, "03_outputs/models/GLM_tune_upsampled.rds")
 
 # Downsampling using NearMiss 1 -------------------------------------------
 
@@ -132,4 +132,4 @@ end-start
 stopCluster(cl = cl)
 
 # write to disk
-write_rds(elanet_tune_down, "03_outputs/GLM_tune_downsampled.rds")
+write_rds(elanet_tune_down, "03_outputs/models/GLM_tune_downsampled.rds")

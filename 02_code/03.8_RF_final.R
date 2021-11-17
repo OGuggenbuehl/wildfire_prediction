@@ -1,7 +1,7 @@
 # Upsampled ---------------------------------------------------------------
 
 # read from disk
-rf_tune_up <- read_rds("03_outputs/RF_tuned_upsampled.rds")
+rf_tune_up <- read_rds("03_outputs/models/RF_tuned_upsampled.rds")
 
 # show metrics
 collect_metrics(rf_tune_up)
@@ -26,11 +26,11 @@ rf_fit_final_up <- best_rf_wf_up %>%
 stopCluster(cl = cl)
 
 # write to disk
-write_rds(rf_fit_final_up, "03_outputs/RF_final_upsampled.rds")
+write_rds(rf_fit_final_up, "03_outputs/models/RF_final_upsampled.rds")
 
 # Downsampled -------------------------------------------------------------
 # read from disk
-rf_tune_down <- read_rds("03_outputs/RF_tuned_downsampled.rds")
+rf_tune_down <- read_rds("03_outputs/models/RF_tuned_downsampled.rds")
 
 # show metrics
 collect_metrics(rf_tune_down)
@@ -55,4 +55,4 @@ rf_fit_final_down <- best_rf_wf_down %>%
 stopCluster(cl = cl)
 
 # write to disk
-write_rds(rf_fit_final_down, "03_outputs/RF_final_downsampled.rds")
+write_rds(rf_fit_final_down, "03_outputs/models/RF_final_downsampled.rds")

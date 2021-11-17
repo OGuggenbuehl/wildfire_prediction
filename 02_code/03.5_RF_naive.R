@@ -34,4 +34,4 @@ end <- Sys.time()
 end-start
 
 # write to disk
-write_rds(rf_fit, "03_outputs/RF_naive.rds")
+write_rds(rf_fit, "03_outputs/models/RF_naive.rds")

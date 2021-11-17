@@ -77,14 +77,14 @@ model_comp_list <- list('naive' = models_naive,
                         'tuned' = models_tuned)
 
 # write to disk
-write_rds(model_comp_list, "03_outputs/model_comp.rds")
+write_rds(model_comp_list, "03_outputs/tables/model_comp.rds")
 # read from disk
-model_comp_list <- read_rds("03_outputs/model_comp.rds")
+model_comp_list <- read_rds("03_outputs/tables/model_comp.rds")
 
 # write to disk for .docx import
-write.table(model_comp_list$naive, file = "03_outputs/model_comp_naive.txt", 
+write.table(model_comp_list$naive, file = "03_outputs/tables/model_comp_naive.txt", 
             sep = ",", quote = FALSE, row.names = FALSE)
-write.table(model_comp_list$resampled %>% View(), file = "03_outputs/model_comp_res.txt", 
+write.table(model_comp_list$resampled %>% View(), file = "03_outputs/tables/model_comp_res.txt", 
             sep = ",", quote = FALSE, row.names = FALSE)
-write.table(model_comp_list$tuned, file = "03_outputs/model_comp_tuned.txt", 
+write.table(model_comp_list$tuned, file = "03_outputs/tables/model_comp_tuned.txt", 
             sep = ",", quote = FALSE, row.names = FALSE)

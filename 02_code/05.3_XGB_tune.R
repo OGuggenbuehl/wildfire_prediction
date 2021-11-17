@@ -88,4 +88,4 @@ xgb_fit_final_down <- best_xgb_wf_down %>%
 # shut down workers
 stopCluster(cl = cl)
 
-write_rds(xgb_fit_final_down, "03_outputs/XGB_final_randomsampled.rds")
+write_rds(xgb_fit_final_down, "03_outputs/models/XGB_final_randomsampled.rds")

@@ -1,7 +1,7 @@
 # Upsampled ---------------------------------------------------------------
 
 # read from disk
-xgb_tune_up <- read_rds("03_outputs/XGB_tuned_upsampled.rds")
+xgb_tune_up <- read_rds("03_outputs/models/XGB_tuned_upsampled.rds")
 
 # show metrics
 collect_metrics(xgb_tune_up) %>% 
@@ -28,12 +28,12 @@ xgb_fit_final_up <- best_xgb_wf_up %>%
 stopCluster(cl = cl)
 
 # write to disk
-write_rds(xgb_fit_final_up, "03_outputs/XGB_final_upsampled.rds")
+write_rds(xgb_fit_final_up, "03_outputs/models/XGB_final_upsampled.rds")
 
 # Downsampled -------------------------------------------------------------
 
 # read from disk
-xgb_tune_down <- read_rds("03_outputs/XGB_tuned_downsampled.rds")
+xgb_tune_down <- read_rds("03_outputs/models/XGB_tuned_downsampled.rds")
 
 # show metrics
 collect_metrics(xgb_tune_down) %>% 
@@ -60,4 +60,4 @@ xgb_fit_final_down <- best_xgb_wf_down %>%
 stopCluster(cl = cl)
 
 # write to disk
-write_rds(xgb_fit_final_down, "03_outputs/XGB_final_downsampled.rds")
+write_rds(xgb_fit_final_down, "03_outputs/models/XGB_final_downsampled.rds")

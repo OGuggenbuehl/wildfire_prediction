@@ -1,4 +1,4 @@
-final_elanet_fit_down <- read_rds("03_outputs/GLM_final_randomsampled.rds")
+final_elanet_fit_down <- read_rds("03_outputs/models/GLM_final_randomsampled.rds")
 
 # metrics
 glm_tuned_down_metrics <- final_elanet_fit_down %>%

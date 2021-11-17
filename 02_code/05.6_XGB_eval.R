@@ -1,4 +1,4 @@
-xgb_fit_final_down <- read_rds("03_outputs/XGB_final_randomsampled.rds")
+xgb_fit_final_down <- read_rds("03_outputs/models/XGB_final_randomsampled.rds")
 
 # metrics
 xgb_tuned_down_metrics <- xgb_fit_final_down %>%

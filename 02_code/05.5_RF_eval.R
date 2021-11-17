@@ -1,4 +1,4 @@
-rf_fit_final_down <- read_rds("03_outputs/RF_final_randomsampled.rds")
+rf_fit_final_down <- read_rds("03_outputs/models/RF_final_randomsampled.rds")
 
 # metrics
 rf_tuned_down_metrics <- rf_fit_final_down %>%

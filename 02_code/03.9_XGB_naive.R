@@ -41,4 +41,4 @@ end <- Sys.time()
 end-start
 
 # write to disk
-write_rds(xgb_fit, "03_outputs/XGB_naive.rds")
+write_rds(xgb_fit, "03_outputs/models/XGB_naive.rds")

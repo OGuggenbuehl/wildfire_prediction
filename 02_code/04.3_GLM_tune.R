@@ -1,7 +1,7 @@
 # Upsampled ---------------------------------------------------------------
 
 # read from disk
-final_elanet_fit_up <- read_rds("03_outputs/GLM_final_upsampled.rds")
+final_elanet_fit_up <- read_rds("03_outputs/models/GLM_final_upsampled.rds")
 
 # metrics
 glm_tuned_up_metrics <- final_elanet_fit_up %>%
@@ -22,7 +22,7 @@ final_elanet_fit_up %>%
 # Downsampled -------------------------------------------------------------
 
 # read from disk
-final_elanet_fit_down <- read_rds("03_outputs/GLM_final_downsampled.rds")
+final_elanet_fit_down <- read_rds("03_outputs/models/GLM_final_downsampled.rds")
 
 # metrics
 glm_tuned_down_metrics <- final_elanet_fit_down %>%

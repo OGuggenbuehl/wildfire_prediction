@@ -99,10 +99,10 @@ model_comp_random <- glm_tuned_down_metrics %>%
   pivot_wider(names_from = model, values_from = .estimate)
 
 # write to disk
-write_rds(model_comp_random, "03_outputs/model_comp_rsplit.rds")
+write_rds(model_comp_random, "03_outputs/tables/model_comp_rsplit.rds")
 # read from disk
-model_comp_random <- read_rds("03_outputs/model_comp_rsplit.rds")
+model_comp_random <- read_rds("03_outputs/tables/model_comp_rsplit.rds")
 
 # write to disk for .docx import
-write.table(model_comp_random, file = "03_outputs/model_comp_rsplit.txt", 
+write.table(model_comp_random, file = "03_outputs/tables/model_comp_rsplit.txt", 
             sep = ",", quote = FALSE, row.names = FALSE)

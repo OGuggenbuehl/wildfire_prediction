@@ -1,6 +1,9 @@
 library(tidyverse)
 library(corrplot)
 
+source("02_code/output_directories.R")
+source("02_code/figures.R")
+
 # load data ---------------------------------------------------------------
 data <- read_rds("01_data/data_seasonal.rds") %>% 
   # drop features

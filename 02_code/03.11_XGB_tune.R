@@ -65,7 +65,7 @@ end-start
 stopCluster(cl = cl)
 
 # write to disk
-write_rds(xgb_tune_up, "03_outputs/XGB_tuned_upsampled.rds")
+write_rds(xgb_tune_up, "03_outputs/models/XGB_tuned_upsampled.rds")
 
 # Downsampling with NearMiss 1 --------------------------------------------
 
@@ -121,4 +121,4 @@ end-start
 stopCluster(cl = cl)
 
 # write to disk
-write_rds(xgb_tune_down, "03_outputs/XGB_tuned_downsampled.rds")
+write_rds(xgb_tune_down, "03_outputs/models/XGB_tuned_downsampled.rds")

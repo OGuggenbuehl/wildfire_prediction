@@ -1,5 +1,5 @@
 # read from disk
-rf_fit <- read_rds("03_outputs/RF_naive.rds")
+rf_fit <- read_rds("03_outputs/models/RF_naive.rds")
 
 # predictions
 rf_naive_preds <- predict(rf_fit, type = 'prob',

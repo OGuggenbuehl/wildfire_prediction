@@ -1,5 +1,5 @@
 # read from disk
-glm_naive <- read_rds("03_outputs/GLM_naive.rds")
+glm_naive <- read_rds("03_outputs/models/GLM_naive.rds")
 
 # predictions
 glm_naive_preds <- predict(glm_naive, type = 'prob',

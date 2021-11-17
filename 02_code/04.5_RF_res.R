@@ -1,7 +1,7 @@
 # Upsampled ---------------------------------------------------------------
 
 # read from disk
-rf_res_up <- read_rds("03_outputs/RF_res_upsampled.rds")
+rf_res_up <- read_rds("03_outputs/models/RF_res_upsampled.rds")
 
 # metrics of resampled fit
 rf_res_up_metrics <- collect_metrics(rf_res_up) %>% 
@@ -23,7 +23,7 @@ rf_preds_up %>%
 # Downsampled -------------------------------------------------------------
 
 # read from disk
-rf_res_down <- read_rds("03_outputs/RF_res_downsampled.rds")
+rf_res_down <- read_rds("03_outputs/models/RF_res_downsampled.rds")
 
 # metrics of resampled fit
 rf_res_down_metrics <- collect_metrics(rf_res_down) %>% 

@@ -90,4 +90,4 @@ final_elanet_fit_down <- final_elanet_wf_down %>%
 # shut down workers
 stopCluster(cl = cl)
 
-write_rds(final_elanet_fit_down, "03_outputs/GLM_final_randomsampled.rds")
+write_rds(final_elanet_fit_down, "03_outputs/models/GLM_final_randomsampled.rds")

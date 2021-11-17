@@ -54,7 +54,7 @@ end-start
 stopCluster(cl = cl)
 
 # write to disk
-write_rds(xgb_res_up, "03_outputs/XGB_res_upsampled.rds")
+write_rds(xgb_res_up, "03_outputs/models/XGB_res_upsampled.rds")
 
 # Downsampling ------------------------------------------------------------
 
@@ -107,4 +107,4 @@ end-start
 stopCluster(cl = cl)
 
 # write to disk
-write_rds(xgb_res_down, "03_outputs/XGB_res_downsampled.rds")
+write_rds(xgb_res_down, "03_outputs/models/XGB_res_downsampled.rds")

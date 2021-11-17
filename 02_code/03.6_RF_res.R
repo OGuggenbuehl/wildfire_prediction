@@ -54,7 +54,7 @@ end-start
 stopCluster(cl = cl)
 
 # write to disk
-write_rds(rf_res_up, "03_outputs/RF_res_upsampled.rds")
+write_rds(rf_res_up, "03_outputs/models/RF_res_upsampled.rds")
 
 # Downsampling with NearMiss 1 --------------------------------------------
 
@@ -107,4 +107,4 @@ end-start
 stopCluster(cl = cl)
 
 # write to disk
-write_rds(rf_res_down, "03_outputs/RF_res_downsampled.rds")
+write_rds(rf_res_down, "03_outputs/models/RF_res_downsampled.rds")

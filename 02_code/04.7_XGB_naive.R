@@ -1,5 +1,5 @@
 # read from disk
-xgb_fit <- read_rds("03_outputs/XGB_naive.rds")
+xgb_fit <- read_rds("03_outputs/models/XGB_naive.rds")
 
 # predictions
 xgb_naive_preds <- predict(xgb_fit, type = 'prob',

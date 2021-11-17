@@ -1,7 +1,7 @@
 # Upsampled ---------------------------------------------------------------
 
 # read from disk
-elanet_tune_up <- read_rds("03_outputs/GLM_tune_upsampled.rds")
+elanet_tune_up <- read_rds("03_outputs/models/GLM_tune_upsampled.rds")
 
 # show metrics
 collect_metrics(elanet_tune_up)
@@ -26,12 +26,12 @@ final_elanet_fit_up <- final_elanet_wf_up %>%
 stopCluster(cl = cl)
 
 # write to disk
-write_rds(final_elanet_fit_up, "03_outputs/GLM_final_upsampled.rds")
+write_rds(final_elanet_fit_up, "03_outputs/models/GLM_final_upsampled.rds")
 
 # Downsampled -------------------------------------------------------------
 
 # read from disk
-elanet_tune_down <- read_rds("03_outputs/GLM_tune_downsampled.rds")
+elanet_tune_down <- read_rds("03_outputs/models/GLM_tune_downsampled.rds")
 
 # show metrics
 collect_metrics(elanet_tune_down)
@@ -56,4 +56,4 @@ final_elanet_fit_down <- final_elanet_wf_down %>%
 stopCluster(cl = cl)
 
 # write to disk
-write_rds(final_elanet_fit_down, "03_outputs/GLM_final_downsampled.rds")
+write_rds(final_elanet_fit_down, "03_outputs/models/GLM_final_downsampled.rds")

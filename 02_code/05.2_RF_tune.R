@@ -81,4 +81,4 @@ rf_fit_final_down <- best_rf_wf_down %>%
 # shut down workers
 stopCluster(cl = cl)
 
-write_rds(rf_fit_final_down, "03_outputs/RF_final_randomsampled.rds")
+write_rds(rf_fit_final_down, "03_outputs/models/RF_final_randomsampled.rds")

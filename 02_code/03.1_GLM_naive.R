@@ -31,4 +31,4 @@ end <- Sys.time()
 end-start
 
 # write to disk
-write_rds(glm_fit, "03_outputs/GLM_naive.rds")
+write_rds(glm_fit, "03_outputs/models/GLM_naive.rds")

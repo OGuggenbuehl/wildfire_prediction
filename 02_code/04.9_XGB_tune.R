@@ -1,7 +1,7 @@
 # Upsampling --------------------------------------------------------------
 
 # read from disk
-xgb_fit_final_up <- read_rds("03_outputs/XGB_final_upsampled.rds")
+xgb_fit_final_up <- read_rds("03_outputs/models/XGB_final_upsampled.rds")
 
 # metrics
 xgb_tuned_up_metrics <- xgb_fit_final_up %>%
@@ -22,7 +22,7 @@ xgb_fit_final_up %>%
 # Downsampling ------------------------------------------------------------
 
 # read from disk
-xgb_fit_final_down <- read_rds("03_outputs/XGB_final_downsampled.rds")
+xgb_fit_final_down <- read_rds("03_outputs/models/XGB_final_downsampled.rds")
 
 # metrics
 xgb_tuned_down_metrics <- xgb_fit_final_down %>%

@@ -7,6 +7,8 @@ library(parallel)
 library(doFuture)
 options(tidymodels.dark = TRUE)
 
+source("02_code/output_directories.R")
+
 # load data ---------------------------------------------------------------
 
 data <- read_rds("01_data/data_seasonal.rds") %>% 

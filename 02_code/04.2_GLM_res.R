@@ -1,7 +1,7 @@
 # Upsampling with SMOTE ---------------------------------------------------
 
 # read from disk
-glm_res_up <- read_rds("03_outputs/GLM_res_upsampled.rds")
+glm_res_up <- read_rds("03_outputs/models/GLM_res_upsampled.rds")
 
 # metrics of resampled fit
 glm_res_up_metrics <- collect_metrics(glm_res_up) %>% 
@@ -23,7 +23,7 @@ glm_preds_up %>%
 # Downsampling with NearMiss1  --------------------------------------------
 
 # read from disk
-glm_res_down <- read_rds("03_outputs/GLM_res_downsampled.rds")
+glm_res_down <- read_rds("03_outputs/models/GLM_res_downsampled.rds")
 
 # metrics of resampled fit
 glm_res_down_metrics <- collect_metrics(glm_res_down) %>% 
