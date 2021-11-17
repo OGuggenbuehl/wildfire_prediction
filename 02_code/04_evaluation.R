@@ -40,6 +40,7 @@ source("02_code/04.9_XGB_tune.R", echo = TRUE)
 # Stacking ----------------------------------------------------------------
 source("02_code/04.10_stacking.R", echo = TRUE)
 
+# create table for comparing metrics
 model_comp <- glm_res_up_metrics %>% 
   bind_rows(glm_res_down_metrics) %>% 
   bind_rows(glm_tuned_up_metrics) %>% 
@@ -63,6 +64,7 @@ model_comp <- glm_res_up_metrics %>%
   arrange(model, .metric) %>% 
   pivot_wider(names_from = model, values_from = .estimate)
 
+# create separate objects for model metrics to save as list elements
 models_naive <- model_comp %>% 
   select(.metric, dplyr::contains("naive"))
 models_res <- model_comp %>% 
@@ -74,8 +76,12 @@ model_comp_list <- list('naive' = models_naive,
                         'resampled' = models_res,
                         'tuned' = models_tuned)
 
+# write to disk
 write_rds(model_comp_list, "03_outputs/model_comp.rds")
+# read from disk
+model_comp_list <- read_rds("03_outputs/model_comp.rds")
 
+# write to disk for .docx import
 write.table(model_comp_list$naive, file = "03_outputs/model_comp_naive.txt", 
             sep = ",", quote = FALSE, row.names = FALSE)
 write.table(model_comp_list$resampled %>% View(), file = "03_outputs/model_comp_res.txt", 

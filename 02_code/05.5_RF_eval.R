@@ -3,7 +3,7 @@ rf_fit_final_down <- read_rds("03_outputs/RF_final_randomsampled.rds")
 # metrics
 rf_tuned_down_metrics <- rf_fit_final_down %>%
   collect_metrics() %>% 
-  mutate(model = 'RF_tuned_downsampled')
+  mutate(model = 'RF_down_randomsplit')
 
 # ROC curve
 rf_fit_final_down %>%

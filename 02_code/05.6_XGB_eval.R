@@ -3,7 +3,7 @@ xgb_fit_final_down <- read_rds("03_outputs/XGB_final_randomsampled.rds")
 # metrics
 xgb_tuned_down_metrics <- xgb_fit_final_down %>%
   collect_metrics() %>% 
-  mutate(model = 'XGB_tuned_downsampled')
+  mutate(model = 'XGB_down_randomsplit')
 
 # ROC curve
 xgb_fit_final_down %>%

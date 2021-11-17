@@ -90,3 +90,19 @@ source("02_code/05.5_RF_eval.R", echo = TRUE)
 # XGB
 source("02_code/05.6_XGB_eval.R", echo = TRUE)
 
+# create table for comparing metrics
+model_comp_random <- glm_tuned_down_metrics %>% 
+  bind_rows(rf_tuned_down_metrics) %>%
+  bind_rows(xgb_tuned_down_metrics) %>% 
+  select(.metric, .estimate, model) %>% 
+  arrange(model, .metric) %>% 
+  pivot_wider(names_from = model, values_from = .estimate)
+
+# write to disk
+write_rds(model_comp_random, "03_outputs/model_comp_rsplit.rds")
+# read from disk
+model_comp_random <- read_rds("03_outputs/model_comp_rsplit.rds")
+
+# write to disk for .docx import
+write.table(model_comp_random, file = "03_outputs/model_comp_rsplit.txt", 
+            sep = ",", quote = FALSE, row.names = FALSE)
