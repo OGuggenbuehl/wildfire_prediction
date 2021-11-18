@@ -62,6 +62,11 @@ end-start
 # shut down workers
 stopCluster(cl = cl)
 
+# write to disk
+write_rds(rf_tune_down, "03_outputs/models/RF_tune_randomsampled.rds")
+# read from disk
+rf_tune_down <- read_rds("03_outputs/models/RF_tune_randomsampled.rds")
+
 # select best tuning specification
 best_rf_down <- select_best(rf_tune_down, "roc_auc")
 

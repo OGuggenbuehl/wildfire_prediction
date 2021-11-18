@@ -68,6 +68,11 @@ end-start
 # shut down workers
 stopCluster(cl = cl)
 
+# write to disk
+write_rds(elanet_tune_down, "03_outputs/models/GLM_tune_randomsampled.rds")
+# read from disk
+elanet_tune_down <- read_rds("03_outputs/models/GLM_tune_randomsampled.rds")
+
 # show metrics
 collect_metrics(elanet_tune_down)
 

@@ -96,6 +96,7 @@ model_comp_random <- glm_tuned_down_metrics %>%
   bind_rows(xgb_tuned_down_metrics) %>% 
   select(.metric, .estimate, model) %>% 
   arrange(model, .metric) %>% 
+  mutate(.estimate = round(.estimate, digits = 3)) %>% 
   pivot_wider(names_from = model, values_from = .estimate)
 
 # write to disk
@@ -106,3 +107,8 @@ model_comp_random <- read_rds("03_outputs/tables/model_comp_rsplit.rds")
 # write to disk for .docx import
 write.table(model_comp_random, file = "03_outputs/tables/model_comp_rsplit.txt", 
             sep = ",", quote = FALSE, row.names = FALSE)
+
+# Ensemble Stack ----------------------------------------------------------
+
+source("02_code/05.7_stacking.R", echo = TRUE)
+
