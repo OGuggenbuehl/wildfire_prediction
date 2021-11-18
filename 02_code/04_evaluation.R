@@ -62,6 +62,7 @@ model_comp <- glm_res_up_metrics %>%
   bind_rows(xgb_naive_metrics) %>% 
   filter(.metric %in% my_metrics) %>% 
   arrange(model, .metric) %>% 
+  mutate(.estimate = round(.estimate, digits = 3)) %>% 
   pivot_wider(names_from = model, values_from = .estimate)
 
 # create separate objects for model metrics to save as list elements
