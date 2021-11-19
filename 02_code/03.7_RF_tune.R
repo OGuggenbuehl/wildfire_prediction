@@ -6,7 +6,7 @@ rf_model <-
   rand_forest(mtry = tune(), 
               min_n = tune(),
               trees = 500) %>% 
-  set_engine("ranger") %>% 
+  set_engine("ranger", importance = "impurity") %>% 
   set_mode("classification")
 
 # Upsampling with SMOTE ---------------------------------------------------

@@ -1,5 +1,6 @@
 library(tidyverse)
 library(tidymodels)
+library(vip)
 
 # read from disk
 data_train <- read_rds("01_data/data_train.rds")

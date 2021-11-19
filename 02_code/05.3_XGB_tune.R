@@ -8,7 +8,7 @@ xgb_model <-
              sample_size = tune(), 
              mtry = tune(),
              learn_rate = tune()) %>% 
-  set_engine("xgboost") %>% 
+  set_engine("xgboost", importance = "impurity") %>% 
   set_mode("classification")
 
 # Downsampling with NearMiss 1 --------------------------------------------
@@ -68,11 +68,6 @@ stopCluster(cl = cl)
 write_rds(xgb_tune_down, "03_outputs/models/XGB_tune_randomsampled.rds")
 # read from disk
 xgb_tune_down <- read_rds("03_outputs/models/XGB_tune_randomsampled.rds")
-
-# show metrics
-collect_metrics(xgb_tune_down) %>% 
-  select(-c(n, std_err, .config)) %>% 
-  pivot_wider(names_from = .metric, values_from = mean)
 
 # select best tuning specification
 best_xgb_down <- select_best(xgb_tune_down, "roc_auc")

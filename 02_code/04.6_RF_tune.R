@@ -19,6 +19,18 @@ rf_fit_final_up %>%
   collect_predictions() %>% 
   conf_mat(truth = fire, estimate = .pred_class)
 
+# variable importance plot
+rf_fit_final_up %>% 
+  pluck(".workflow", 1) %>%   
+  extract_fit_parsnip() %>% 
+  vip(num_features = 15, 
+      aesthetics = list(fill = "steelblue"))+
+  labs(title = "Variable Importance",
+       subtitle = "Random Forest, upsampled training data, temporal split (2016)")+
+  theme_minimal()
+
+ggsave("03_outputs/plots/vip_rf_up_time.png")
+
 # Downsampled -------------------------------------------------------------
 
 # read from disk
@@ -39,3 +51,15 @@ rf_fit_final_down %>%
 rf_fit_final_down %>%
   collect_predictions() %>% 
   conf_mat(truth = fire, estimate = .pred_class)
+
+# variable importance plot
+rf_fit_final_down %>% 
+  pluck(".workflow", 1) %>%   
+  extract_fit_parsnip() %>% 
+  vip(num_features = 15, 
+      aesthetics = list(fill = "steelblue"))+
+  labs(title = "Variable Importance",
+       subtitle = "Random Forest, downsampled training data, temporal split (2016)")+
+  theme_minimal()
+
+ggsave("03_outputs/plots/vip_rf_down_time.png")

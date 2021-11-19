@@ -10,7 +10,7 @@ xgb_model <-
              sample_size = tune(), 
              mtry = tune(),
              learn_rate = tune()) %>% 
-  set_engine("xgboost") %>% 
+  set_engine("xgboost", importance = "impurity") %>% 
   set_mode("classification")
 
 # Upsampling with SMOTE ---------------------------------------------------
