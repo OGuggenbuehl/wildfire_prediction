@@ -12,7 +12,14 @@ rf_tuned_up_metrics <- rf_fit_final_up %>%
 rf_fit_final_up %>%
   collect_predictions() %>% 
   roc_curve(fire, .pred_fire) %>% 
-  autoplot()
+  autoplot()+
+  theme_minimal()+
+  labs(
+    title = "ROC-curve Random Forest",
+    subtitle = "upsampled, temporal split (2016)"
+  )
+
+ggsave("03_outputs/plots/roc_rf_up_time.png")
 
 # confusion matrix
 rf_fit_final_up %>%
@@ -45,7 +52,14 @@ rf_tuned_down_metrics <- rf_fit_final_down %>%
 rf_fit_final_down %>%
   collect_predictions() %>% 
   roc_curve(fire, .pred_fire) %>% 
-  autoplot()
+  autoplot()+
+  theme_minimal()+
+  labs(
+    title = "ROC-curve Random Forest",
+    subtitle = "downsampled, temporal split (2016)"
+  )
+
+ggsave("03_outputs/plots/roc_rf_down_time.png")
 
 # confusion matrix
 rf_fit_final_down %>%

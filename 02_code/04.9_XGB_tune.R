@@ -12,7 +12,14 @@ xgb_tuned_up_metrics <- xgb_fit_final_up %>%
 xgb_fit_final_up %>%
   collect_predictions() %>% 
   roc_curve(fire, .pred_fire) %>% 
-  autoplot()
+  autoplot()+
+  theme_minimal()+
+  labs(
+    title = "ROC-curve xgboost",
+    subtitle = "upsampled, temporal split (2016)"
+  )
+
+ggsave("03_outputs/plots/roc_xgb_up_time.png")
 
 # confusion matrix
 xgb_fit_final_up %>%
@@ -45,7 +52,14 @@ xgb_tuned_down_metrics <- xgb_fit_final_down %>%
 xgb_fit_final_down %>%
   collect_predictions() %>% 
   roc_curve(fire, .pred_fire) %>% 
-  autoplot()
+  autoplot()+
+  theme_minimal()+
+  labs(
+    title = "ROC-curve xgboost",
+    subtitle = "downsampled, temporal split (2016)"
+  )
+
+ggsave("03_outputs/plots/roc_xgb_down_time.png")
 
 # confusion matrix
 xgb_fit_final_down %>%

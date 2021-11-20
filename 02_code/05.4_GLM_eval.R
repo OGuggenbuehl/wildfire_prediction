@@ -9,7 +9,14 @@ glm_tuned_down_metrics <- final_elanet_fit_down %>%
 final_elanet_fit_down %>%
   collect_predictions() %>% 
   roc_curve(fire, .pred_fire) %>% 
-  autoplot()
+  autoplot()+
+  theme_minimal()+
+  labs(
+    title = "ROC-curve elastic net regression",
+    subtitle = "downsampled, randomized split"
+  )
+
+ggsave("03_outputs/plots/roc_glm_rsampl.png")
 
 # Confusion Matrix
 final_elanet_fit_down %>%
