@@ -80,7 +80,7 @@ plan(cluster, workers = cl)
 
 # fit final RF model
 rf_fit_final_down <- best_rf_wf_down %>%
-  last_fit(split = t_split, 
+  last_fit(split = r_split, 
            metrics = metrics)
 
 # shut down workers

@@ -82,7 +82,7 @@ plan(cluster, workers = cl)
 
 # fit final model
 xgb_fit_final_down <- best_xgb_wf_down %>%
-  last_fit(split = t_split, 
+  last_fit(split = r_split, 
            metrics = metrics)
 
 # shut down workers

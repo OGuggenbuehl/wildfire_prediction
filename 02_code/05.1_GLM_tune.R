@@ -86,7 +86,7 @@ plan(cluster, workers = cl)
 
 # fit final elanet model
 final_elanet_fit_down <- final_elanet_wf_down %>%
-  last_fit(split = t_split, 
+  last_fit(split = r_split, 
            metrics = metrics)
 
 # shut down workers
