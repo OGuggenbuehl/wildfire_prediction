@@ -35,12 +35,12 @@ n_train <- data %>%
 
 prop <- n_train/nrow(data)
 
-t_split <- initial_split(data, 
+r_split <- initial_split(data, 
                          prop = prop, 
                          strata = fire)
 
-data_train <- training(t_split)
-data_test <- testing(t_split)
+data_train <- training(r_split)
+data_test <- testing(r_split)
 
 # Modeling Setup ----------------------------------------------------------
 
@@ -112,4 +112,3 @@ write.table(model_comp_random, file = "03_outputs/tables/model_comp_rsplit.txt",
 # Ensemble Stack ----------------------------------------------------------
 
 source("02_code/05.7_stacking.R", echo = TRUE)
-
