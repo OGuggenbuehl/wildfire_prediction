@@ -1,12 +1,12 @@
-rf_fit_final_down <- read_rds("03_outputs/models/RF_final_randomsampled.rds")
+rf_fit_final_rsampl <- read_rds("03_outputs/models/RF_final_randomsampled.rds")
 
 # metrics
-rf_tuned_down_metrics <- rf_fit_final_down %>%
+rf_final_rsampl_metrics <- rf_fit_final_rsampl %>%
   collect_metrics() %>% 
   mutate(model = 'RF_down_randomsplit')
 
 # ROC curve
-rf_fit_final_down %>%
+rf_fit_final_rsampl %>%
   collect_predictions() %>% 
   roc_curve(fire, .pred_fire) %>% 
   autoplot()+
@@ -19,12 +19,12 @@ rf_fit_final_down %>%
 ggsave("03_outputs/plots/roc_rf_rsampl.png")
 
 # confusion matrix
-rf_fit_final_down %>%
+rf_fit_final_rsampl %>%
   collect_predictions() %>% 
   conf_mat(truth = fire, estimate = .pred_class)
 
 # variable importance plot
-rf_fit_final_down %>% 
+rf_fit_final_rsampl %>% 
   pluck(".workflow", 1) %>%   
   extract_fit_parsnip() %>% 
   vip(num_features = 15, 
@@ -36,7 +36,7 @@ rf_fit_final_down %>%
 ggsave("03_outputs/plots/vip_rf_rsample.png")
 
 # vip grid
-rf_fit_final_down %>% 
+rf_fit_final_rsampl %>% 
   pluck(".workflow", 1) %>%   
   extract_fit_parsnip() %>% 
   vip(num_features = 15, 
