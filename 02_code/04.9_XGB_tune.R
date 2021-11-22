@@ -77,3 +77,17 @@ xgb_fit_final_down %>%
   theme_minimal()
 
 ggsave("03_outputs/plots/vip_xgb_down_time.png")
+
+# vip grid
+xgb_fit_final_down %>% 
+  pluck(".workflow", 1) %>%   
+  extract_fit_parsnip() %>% 
+  vip(num_features = 15, 
+      aesthetics = list(fill = "steelblue"))+
+  labs(title = "XGB downsampled",
+       subtitle = "temporal split")+
+  theme_minimal()+
+  theme(axis.text.x = element_text(angle = 35, hjust = 1))
+
+ggsave("03_outputs/plots/vip_grid_xgb_down_time.png", 
+       width = 4, height = 4, units = 'in')
