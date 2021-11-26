@@ -61,9 +61,29 @@ rf_fit_final_down %>%
 
 ggsave("03_outputs/plots/roc_rf_down_time.png")
 
-# confusion matrix
-rf_fit_final_down %>%
+# predictions
+rf_down_preds <- rf_fit_final_down %>%
   collect_predictions() %>% 
+  select(-c(id, .config, .row))
+
+# prepare for susceptibility mapping
+rf_mapping_df <- data_test %>% 
+  select(id, year, season) %>% 
+  bind_cols(rf_down_preds)
+
+for (season_i in c("winter", "summer")) {
+  
+  for (year_j in c(2017, 2018)) {
+    
+    rf_mapping_df %>% 
+      filter(season == season_i, 
+             year == year_j) %>% 
+      write_csv(glue("03_outputs/tables/mapping_RF_{year_j}_{season_i}.csv"))
+  }
+}
+
+# confusion matrix
+rf_down_preds %>% 
   conf_mat(truth = fire, estimate = .pred_class)
 
 # variable importance plot

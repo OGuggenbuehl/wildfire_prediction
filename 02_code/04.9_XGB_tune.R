@@ -61,6 +61,27 @@ xgb_fit_final_down %>%
 
 ggsave("03_outputs/plots/roc_xgb_down_time.png")
 
+# predictions
+xgb_down_preds <- xgb_fit_final_down %>%
+  collect_predictions() %>% 
+  select(-c(id, .config, .row))
+
+# prepare for susceptibility mapping
+xgb_mapping_df <- data_test %>% 
+  select(id, year, season) %>% 
+  bind_cols(xgb_down_preds)
+
+for (season_i in c("winter", "summer")) {
+  
+  for (year_j in c(2017, 2018)) {
+    
+    xgb_mapping_df %>% 
+      filter(season == season_i, 
+             year == year_j) %>% 
+      write_csv(glue("03_outputs/tables/mapping_XGB_{year_j}_{season_i}.csv"))
+  }
+}
+
 # confusion matrix
 xgb_fit_final_down %>%
   collect_predictions() %>% 
