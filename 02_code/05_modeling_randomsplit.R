@@ -6,6 +6,7 @@ library(themis)
 library(vip)
 library(parallel)
 library(doFuture)
+library(writexl)
 options(tidymodels.dark = TRUE)
 
 # load data ---------------------------------------------------------------

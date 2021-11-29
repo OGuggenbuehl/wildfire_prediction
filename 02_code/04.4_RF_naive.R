@@ -9,7 +9,14 @@ rf_naive_preds <- predict(rf_fit, type = 'prob',
 # plot ROC curve
 rf_naive_preds %>% 
   roc_curve(truth = fire, .pred_fire) %>% 
-  autoplot()
+  autoplot()+
+  theme_minimal()+
+  labs(
+    title = "ROC-curve Random Forest",
+    subtitle = "naïve estimation, temporal split (2016)"
+  )
+
+ggsave("03_outputs/plots/appendix/roc_rf_naive.png")
 
 # confusion matrix
 rf_confmat <- predict(rf_fit, type = 'class',
@@ -28,4 +35,7 @@ rf_naive_metrics <- summary(rf_confmat) %>%
                                           .pred_fire, 
                                           data = rf_naive_preds)) %>% 
   mutate(model = 'RF_naive') %>% 
-  select(-.estimator)
+  select(-.estimator) %>% 
+  filter(.metric %in% my_metrics)
+
+write_xlsx(rf_naive_metrics, "03_outputs/tables/appendix/rf_naive_metrics.xlsx")

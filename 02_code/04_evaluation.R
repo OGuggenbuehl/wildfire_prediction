@@ -2,6 +2,7 @@ library(tidyverse)
 library(tidymodels)
 library(vip)
 library(glue)
+library(writexl)
 
 # read from disk
 data_train <- read_rds("01_data/data_train.rds")

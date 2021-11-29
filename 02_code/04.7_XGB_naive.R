@@ -9,7 +9,14 @@ xgb_naive_preds <- predict(xgb_fit, type = 'prob',
 # plot ROC curve
 xgb_naive_preds %>% 
   roc_curve(truth = fire, .pred_fire) %>% 
-  autoplot()
+  autoplot()+
+  theme_minimal()+
+  labs(
+    title = "ROC-curve xgboost",
+    subtitle = "naïve estimation, temporal split (2016)"
+  )
+
+ggsave("03_outputs/plots/appendix/roc_xgb_naive.png")
 
 # confusion matrix
 xgb_confmat <- predict(xgb_fit, type = 'class',
@@ -23,9 +30,12 @@ xgb_confmat
 xgb_naive_metrics <- summary(xgb_confmat) %>% 
   bind_rows(roc_auc(truth = fire, 
                     .pred_fire, 
-                    data = rf_naive_preds)) %>% 
+                    data = xgb_naive_preds)) %>% 
   bind_rows(classification_cost_penalized(truth = fire, 
                                           .pred_fire, 
                                           data = xgb_naive_preds)) %>% 
   mutate(model = 'XGB_naive') %>% 
-  select(-.estimator)
+  select(-.estimator) %>% 
+  filter(.metric %in% my_metrics)
+
+write_xlsx(xgb_naive_metrics, "03_outputs/tables/appendix/xgb_naive_metrics.xlsx")

@@ -5,6 +5,8 @@ xgb_final_rsampl_metrics <- xgb_fit_final_rsampl %>%
   collect_metrics() %>% 
   mutate(model = 'XGB_down_randomsplit')
 
+write_xlsx(xgb_final_rsampl_metrics, "03_outputs/tables/appendix/xgb_rsampl_metrics.xlsx")
+
 # ROC curve
 xgb_fit_final_rsampl %>%
   collect_predictions() %>% 

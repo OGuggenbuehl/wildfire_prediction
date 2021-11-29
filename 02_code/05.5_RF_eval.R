@@ -5,6 +5,8 @@ rf_final_rsampl_metrics <- rf_fit_final_rsampl %>%
   collect_metrics() %>% 
   mutate(model = 'RF_down_randomsplit')
 
+write_xlsx(rf_final_rsampl_metrics, "03_outputs/tables/appendix/rf_rsampl_metrics.xlsx")
+
 # ROC curve
 rf_fit_final_rsampl %>%
   collect_predictions() %>% 

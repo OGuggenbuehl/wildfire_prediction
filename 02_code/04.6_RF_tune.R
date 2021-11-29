@@ -8,6 +8,8 @@ rf_tuned_up_metrics <- rf_fit_final_up %>%
   collect_metrics() %>% 
   mutate(model = 'RF_tuned_upsampled')
 
+write_xlsx(rf_tuned_up_metrics, "03_outputs/tables/appendix/rf_tuned_up_metrics.xlsx")
+
 # ROC curve
 rf_fit_final_up %>%
   collect_predictions() %>% 
@@ -47,6 +49,8 @@ rf_fit_final_down <- read_rds("03_outputs/models/RF_final_downsampled.rds")
 rf_tuned_down_metrics <- rf_fit_final_down %>%
   collect_metrics() %>% 
   mutate(model = 'RF_tuned_downsampled')
+
+write_xlsx(rf_tuned_down_metrics, "03_outputs/tables/appendix/rf_tuned_down_metrics.xlsx")
 
 # ROC curve
 rf_fit_final_down %>%

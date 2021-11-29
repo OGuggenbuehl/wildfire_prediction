@@ -8,6 +8,8 @@ xgb_tuned_up_metrics <- xgb_fit_final_up %>%
   collect_metrics() %>% 
   mutate(model = 'XGB_tuned_upsampled')
 
+write_xlsx(xgb_tuned_up_metrics, "03_outputs/tables/appendix/xgb_tuned_up_metrics.xlsx")
+
 # ROC curve
 xgb_fit_final_up %>%
   collect_predictions() %>% 
@@ -47,6 +49,8 @@ xgb_fit_final_down <- read_rds("03_outputs/models/XGB_final_downsampled.rds")
 xgb_tuned_down_metrics <- xgb_fit_final_down %>%
   collect_metrics() %>% 
   mutate(model = 'XGB_tuned_downsampled')
+
+write_xlsx(xgb_tuned_down_metrics, "03_outputs/tables/appendix/xgb_tuned_down_metrics.xlsx")
 
 # ROC curve
 xgb_fit_final_down %>%

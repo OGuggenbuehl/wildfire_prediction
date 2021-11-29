@@ -5,6 +5,8 @@ glm_tuned_down_metrics <- final_elanet_fit_down %>%
   collect_metrics() %>% 
   mutate(model = 'GLM_down_randomsplit')
 
+write_xlsx(glm_tuned_down_metrics, "03_outputs/tables/appendix/glm_rsampl_metrics.xlsx")
+
 # ROC curve
 final_elanet_fit_down %>%
   collect_predictions() %>% 
