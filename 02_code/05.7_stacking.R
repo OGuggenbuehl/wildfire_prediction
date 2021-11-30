@@ -1,7 +1,4 @@
-library(tidyverse)
-library(tidymodels)
 library(stacks)
-library(themis)
 
 glm_tune <- read_rds("03_outputs/models/GLM_tune_randomsampled.rds")
 rf_tune <- read_rds("03_outputs/models/RF_tune_randomsampled.rds")
