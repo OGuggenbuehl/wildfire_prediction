@@ -106,6 +106,3 @@ source("02_code/03.10_XGB_res.R", echo = TRUE)
 source("02_code/03.11_XGB_tune.R", echo = TRUE)
 # final fit
 source("02_code/03.12_XGB_final.R", echo = TRUE)
-
-# Stacking ----------------------------------------------------------------
-source("02_code/03.13_stacking.R", echo = TRUE)
